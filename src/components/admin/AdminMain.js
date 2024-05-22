@@ -8,7 +8,6 @@ import Dashboard from "./Dashboard";
 import Productos from "./Productos";
 import Series from "./Series";
 import AgregarSerie from "./AgregarSerie";
-import Agregar from "./Agregar";
 import AgregarProducto from "./AgregarProducto";
 import ListaUsuarios from "./Lista_Usuarios";
 import data from './data.json';
@@ -32,7 +31,6 @@ export default function AdminMain() {
           <Route path="lista-ordenes" element={<ListaOrdenes />} />
           <Route path="productos" element={<Productos data={data} />} />
           <Route path="series" element={<Series />} />
-          <Route path="agregar" element={<Agregar />} />
           <Route path="agregarproducto" element={<AgregarProducto />} />
           <Route path="agregarserie/:id" element={<AgregarSerie />} />
         </Routes>
