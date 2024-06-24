@@ -41,13 +41,13 @@ function DrawerDev() {
             <Link variant="body2" color="textSecondary" href="/admin/dashboard">
               Dashboard
             </Link>
-            <Link variant="body2" color="textSecondary" href="/admin/lista-usuarios">
+            <Link variant="body2" color="textSecondary" href="/admin/usuarios">
               Usuarios registrados
             </Link>
             <Link variant="body2" color="textSecondary" href="/admin/productos">
               Productos
             </Link>
-            <Link variant="body2" color="textSecondary" href="/admin/lista-ordenes">
+            <Link variant="body2" color="textSecondary" href="/admin/ordenes">
               Órdenes
             </Link>
             <Link variant="body2" color="textSecondary" href="/admin/productos">

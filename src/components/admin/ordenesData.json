@@ -1,0 +1,21 @@
+[
+    {
+      "id": 1,
+      "nombre": "Juan",
+      "apellido": "Perez",
+      "fechaOrden": "2021-01-01",
+      "cuentaTotal": 1000,
+      "correo": "51181@gmail.com",
+      "estado": "entregado"
+    },
+    {
+      "id": 2,
+      "nombre": "Pedro",
+      "apellido": "Gomez",
+      "fechaOrden": "2021-01-01",
+      "cuentaTotal": 2000,
+      "correo": "8122516@gmail.com",
+      "estado": "pendiente"
+    }
+
+  ]
