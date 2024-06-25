@@ -27,6 +27,19 @@ app.get("/admin/usuarios", function(req, res){
       res.json(resultado);
   });
 });
+app.post("/admin/usuarios", function(req, res){
+        const data = req.body;
+        Usuario.create({
+            nombre: data.nombre,
+            apellido: data.apellido,
+            correo: data.correo,
+            contrasena: data.contrasena,
+            fechaRegistro: data.fechaRegistro,
+            estado: data.estado
+        }).then((resultado) => {
+            res.json(resultado);
+        });
+});
 app.get("/admin/ordenes/:id", function(req, res){
       Orden.findByPk(req.params.id).then((resultado) => {
       res.json(resultado);

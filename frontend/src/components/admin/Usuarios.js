@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import UsuariosData from './usuariosData.json'; 
 
 function TablePaginationActions(props) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -36,21 +35,38 @@ function TablePaginationActions(props) {
 }
 
 export default function Usuarios() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState(UsuariosData);
+  const [searchTerm, setSearchTerm] = useState(""); 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [usuariosData, setUsuariosData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setFilteredData(
-      UsuariosData.filter((user) =>
-        user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.correo.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [searchTerm]);
+    const Usuarios = async () => {
+      try {
+        const response = await fetch('http://localhost:3080/admin/usuarios', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Error al obtener los usuarios');
+        }
+        const data = await response.json();
+        setUsuariosData(data);
+      } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+      }
+    };
+    Usuarios();
+  }, []);
+
+  const filteredData = usuariosData.filter((user) =>
+    user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.correo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -62,7 +78,7 @@ export default function Usuarios() {
   };
 
   const handleViewClick = (user) => {
-    console.log(user);
+    //navigate(`/usuarios/${user.id}`);
   };
 
   return (
