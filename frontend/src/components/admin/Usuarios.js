@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { green, red } from '@mui/material/colors';
 
 function TablePaginationActions(props) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -15,7 +16,7 @@ function TablePaginationActions(props) {
   };
 
   return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+    <Box sx={{ flexShrink: 0, ml: 2.5}}>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
@@ -41,6 +42,8 @@ export default function Usuarios() {
   const [usuariosData, setUsuariosData] = useState([]);
   const navigate = useNavigate();
   const URL = 'http://localhost:3080/';
+  const [contador, setContador] = useState(1);
+  const [opcion, setOpcion] = useState("Desactivar");
 
   useEffect(() => {
     const Usuarios = async () => {
@@ -78,19 +81,50 @@ export default function Usuarios() {
     setPage(0);
   };
 
-  const handleViewClick = (user) => {
-    //navigate(`/usuarios/${user.id}`);
+  const handleClickVer = (user) => { 
+    navigate(`/admin/usuario/${user.id}`, { state: { user } });
   };
-
+  const handleClickActivar = async (user) => {
+    setContador(contador + 1);
+    try {
+      const nuevoEstado = contador % 2 !== 0 ? "Inactivo" : "Activo";
+      const response = await fetch(URL + 'admin/usuarios/' + user.id, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          estado: nuevoEstado
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Error al actualizar el estado del usuario');
+      }
+      const updatedUser = await response.json();
+      setUsuariosData(prevUsuariosData => prevUsuariosData.map(usuario =>
+        usuario.id === updatedUser.id ? updatedUser : usuario
+      ));
+      setOpcion(nuevoEstado === "Inactivo" ? "Activar" : "Desactivar");
+    } catch (error) {
+      console.error('Error al actualizar el estado del usuario:', error);
+    }
+  };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px"}}>
       <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="div" sx={{ paddingTop: "15px", paddingBottom: "15px" }}>
-          Usuarios
-        </Typography>
-        <TextField 
+        <Box sx={{
+            paddingBottom: "8px",
+            paddingTop: "8px",
+            backgroundColor: 'skyblue',
+            width: '77vw'
+          }}><Typography paddingLeft="1vw" variant="h6" component="div">
+          Usuarios Registrados
+          </Typography>
+        </Box>
+        <Box sx={{paddingTop: "8px", paddingBottom: "8px"}}></Box>
+        <TextField
           id='Users' 
-          placeholder='Buscar por correo, nombre o apellido' 
+          placeholder='  Buscar por correo, nombre o apellido' 
           variant='outlined'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -100,7 +134,7 @@ export default function Usuarios() {
             width: '77vw',
           }}
         />
-        <TableContainer component={Paper} sx={{ flexGrow: 1 }}>
+        <TableContainer component={Paper} sx={{ flexGrow: 1}}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -110,7 +144,7 @@ export default function Usuarios() {
                 <TableCell>Correo</TableCell>
                 <TableCell>Fecha de registro</TableCell>
                 <TableCell>Estado</TableCell>
-                <TableCell>Acciones</TableCell>
+                <TableCell justifyContent="center">Acciones</TableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
@@ -123,7 +157,8 @@ export default function Usuarios() {
                   <TableCell>{user.fechaRegistro}</TableCell>
                   <TableCell>{user.estado}</TableCell>
                   <TableCell>
-                    <Button color="primary" onClick={() => handleViewClick(user)}>Ver</Button>
+                      <Button onClick={() => handleClickVer(user)}>Ver</Button>{' | '}
+                      <Button onClick={() => handleClickActivar(user)}>{opcion}</Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -131,20 +166,20 @@ export default function Usuarios() {
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={6}
-                  count={filteredData.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    inputProps: {
-                      'aria-label': 'rows per page',
-                    },
-                    native: true,
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
+                      rowsPerPageOptions={[5, 10, 25]}
+                      colSpan={7} 
+                      count={filteredData.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        inputProps: {
+                          'aria-label': 'rows per page',
+                        },
+                        native: true,
+                      }}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
                 />
               </TableRow>
             </TableFooter>

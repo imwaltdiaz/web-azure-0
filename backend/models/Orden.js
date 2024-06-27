@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
-
 export const Orden = sequelize.define(
     "Orden", {
         id: {
@@ -15,6 +14,12 @@ export const Orden = sequelize.define(
             type: DataTypes.INTEGER
         },
         estado: {
+            type: DataTypes.STRING
+        },
+        direccion: {
+            type: DataTypes.STRING
+        },
+        metPago: {
             type: DataTypes.STRING
         }
     }, {

@@ -35,14 +35,14 @@ app.get("/admin/usuarios/:id", async function(req, res){
     try{
         const usuario = await Usuario.findOne({
             where: {id: idUser}, include: [
-                {model: Orden, as: "ordenes", attributes: ["id", "fechaOrden", "cuentaTotal", "estado"]}]});
+                {model: Orden, attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago"]}]});
         res.status(201).json(usuario);
     }catch(error){  
         res.status(400).json("Error en la BD");
     }   
 });
 app.get("/admin/usuarios", async function(req, res){
-      const usuarios = await Usuario.findAll({include: [{model: Orden, as: "ordenes", attributes: ["id", "fechaOrden", "cuentaTotal", "estado"]}]});
+      const usuarios = await Usuario.findAll({include: [{model: Orden, attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago"]}]});
       res.status(201).json(usuarios);
 });
 app.post("/admin/usuario", async function(req, res){
@@ -99,31 +99,56 @@ app.get("/admin/ordenes/:id", async function(req, res){
     }
 });
 app.get("/admin/ordenes", async function(req, res){
-        const ordenes = await Orden.findAll();
+        const ordenes = await Orden.findAll({include: [{model: Usuario, attributes: ["id", "nombre", "apellido", "correo"]}]});
         res.status(201).json(ordenes);
 });
 app.get("/admin/usuarios/:id/ordenes", async function(req, res){
-      const idUser = req.params.id;
-      const usuario = await Usuario.findOne({where: {id: idUser}});
-      const ordenes = await usuario.getOrdenes();
+    const idUser = req.params.id;
+    try {
+      const usuario = await Usuario.findOne({ where: { id: idUser } });
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+      const ordenes = await usuario.getOrdens();
       res.json(ordenes);
-});
-app.post("/admin/usuarios/:id/orden", async function(req, res){
+    } catch (error) {
+      console.error('Error al obtener las órdenes:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+app.post("/admin/usuarios/:id/orden", async function(req, res) {
+    try {
         const data = req.body;
         const idUser = req.params.id;
-        if(data.nombre && data.apellido && data.fechaOrden && data.cuentaTotal && data.correo && data.estado){
+
+        const usuario = await Usuario.findByPk(idUser);
+        if (!usuario) {
+            console.log('Usuario no encontrado');
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        if (data.fechaOrden && data.cuentaTotal && data.estado) {
             const ordenCreada = await Orden.create({
                 fechaOrden: data.fechaOrden,
                 cuentaTotal: data.cuentaTotal,
-                estado: data.estado
+                estado: data.estado,
+                direccion: data.direccion,
+                metPago: data.metPago,
+                usuarioId: idUser
             });
-            const usuario = await Usuario.findOne({where: {id: idUser}});    
             await usuario.addOrden(ordenCreada);
-            const result = await Orden.findOne({where: {id: ordenCreada.id}});
-            res.status(201).json(result);
-        }else{
-            res.status(400).json("Faltan datos");
+            const result = await Orden.findOne({ 
+                where: { id: ordenCreada.id },
+                include: [{ model: Usuario, attributes: ["nombre", "apellido", "correo"]}]
+            });
+            return res.status(201).json(result);
+        } else {
+            console.log('Faltan datos en req.body:', data);
+            return res.status(400).json("Faltan datos");
         }
+    } catch (error) {
+        console.error('Error al crear la orden y asociarla al usuario:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 app.put("/admin/ordenes/:id", async function(req, res){
         const idOrden = req.params.id;
@@ -133,7 +158,9 @@ app.put("/admin/ordenes/:id", async function(req, res){
             await orden.update({
                 fechaOrden: data.fechaOrden,
                 cuentaTotal: data.cuentaTotal,
-                estado: data.estado
+                estado: data.estado,
+                direccion: data.direccion,
+                metPago: data.metPago
             });
             res.status(201).json(orden);
         }catch(error){

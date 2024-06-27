@@ -12,6 +12,8 @@ import AgregarProducto from "./AgregarProducto";
 import Usuarios from "./Usuarios";
 import data from './data.json';
 import Ordenes from "./Ordenes";
+import DetalleUsuario from "./DetalleUsuario";
+import DetalleOrden from "./DetalleOrden";
 
 export default function AdminMain() {
   return (
@@ -33,6 +35,8 @@ export default function AdminMain() {
           <Route path="series" element={<Series />} />
           <Route path="agregarproducto" element={<AgregarProducto />} />
           <Route path="agregarserie/:id" element={<AgregarSerie />} />
+          <Route path="usuario/:id" element={<DetalleUsuario />} />
+          <Route path="orden/:id" element={<DetalleOrden />} />
         </Routes>
       </Stack>
       <Footer />

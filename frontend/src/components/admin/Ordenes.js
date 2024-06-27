@@ -40,12 +40,13 @@ export default function Ordenes() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [ordenesData, setOrdenesData] = useState([]);
   const navigate = useNavigate();
+  const URL = 'http://localhost:3080/';
 
 
   useEffect(() => {
     const Ordenes = async () => {
       try {
-        const response = await fetch('http://localhost:3080/admin/ordenes', {
+        const response = await fetch(URL+'admin/ordenes', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -64,8 +65,8 @@ export default function Ordenes() {
   }, []);
 
   const filteredData = ordenesData.filter((order) =>
-    order.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.Usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.Usuario.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.id.toString().includes(searchTerm)
   );
 
@@ -78,19 +79,26 @@ export default function Ordenes() {
     setPage(0);
   };
 
-  const handleViewClick = (order) => {
-    console.log("Ver orden", order);
+  const handleClickVer = (order) => {
+    navigate(`/admin/orden/${order.id}`, { state: { order } });
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px"}}>
       <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="div" sx={{ paddingTop: "15px", paddingBottom: "15px" }}>
+        <Box sx={{
+            paddingBottom: "8px",
+            paddingTop: "8px",
+            backgroundColor: 'skyblue',
+            width: '77vw'
+          }}><Typography paddingLeft="1vw" variant="h6" component="div">
           Ordenes
-        </Typography>
+          </Typography>
+        </Box>
+        <Box sx={{paddingTop: "8px", paddingBottom: "8px"}}></Box>
         <TextField 
           id='Orders' 
-          placeholder='Nombre o apellido del usuario o numero de orden(id)' 
+          placeholder='  Nombre o apellido del usuario o numero de orden' 
           variant='outlined'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -117,13 +125,13 @@ export default function Ordenes() {
               {filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.nombre}{" "}{order.apellido}</TableCell>
+                  <TableCell>{order.Usuario.nombre}{" "}{order.Usuario.apellido}</TableCell>
                   <TableCell>{order.fechaOrden}</TableCell>
                   <TableCell>{order.cuentaTotal}</TableCell>
-                  <TableCell>{order.correo}</TableCell>
+                  <TableCell>{order.Usuario.correo}</TableCell>
                   <TableCell>{order.estado}</TableCell>
                   <TableCell>
-                    <Button color="primary" onClick={() => handleViewClick(order)}>Ver</Button>
+                    <Button onClick={() => handleClickVer(order)}>Ver</Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -131,20 +139,20 @@ export default function Ordenes() {
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={6}
-                  count={filteredData.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    inputProps: {
-                      'aria-label': 'rows per page',
-                    },
-                    native: true,
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
+                      rowsPerPageOptions={[5, 10, 25]}
+                      colSpan={7} 
+                      count={filteredData.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        inputProps: {
+                          'aria-label': 'rows per page',
+                        },
+                        native: true,
+                      }}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
                 />
               </TableRow>
             </TableFooter>
