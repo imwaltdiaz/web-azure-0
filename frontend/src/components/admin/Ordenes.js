@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import OrdenesData from './ordenesData.json'; 
 
 function TablePaginationActions(props) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -36,20 +35,39 @@ function TablePaginationActions(props) {
 }
 
 export default function Ordenes() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState(OrdenesData);
+  const [searchTerm, setSearchTerm] = useState(""); 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [ordenesData, setOrdenesData] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    setFilteredData(
-      OrdenesData.filter((order) =>
-        order.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.id.toString().includes(searchTerm)
-      )
-    );
-  }, [searchTerm]);
+    const Ordenes = async () => {
+      try {
+        const response = await fetch('http://localhost:3080/admin/ordenes', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Error al obtener los usuarios');
+        }
+        const data = await response.json();
+        setOrdenesData(data);
+      } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+      }
+    };
+    Ordenes();
+  }, []);
+
+  const filteredData = ordenesData.filter((order) =>
+    order.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.id.toString().includes(searchTerm)
+  );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -72,7 +90,7 @@ export default function Ordenes() {
         </Typography>
         <TextField 
           id='Orders' 
-          placeholder='Nombre o apellido del usuario o numero de orden' 
+          placeholder='Nombre o apellido del usuario o numero de orden(id)' 
           variant='outlined'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

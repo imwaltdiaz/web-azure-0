@@ -8,20 +8,11 @@ export const Orden = sequelize.define(
             primaryKey: true,
             autoIncrement: true
         },
-        nombre: {
-            type: DataTypes.STRING
-        },
-        apellido: {
-            type: DataTypes.STRING
-        },
         fechaOrden: {
-            type: DataTypes.DATE
+            type: DataTypes.STRING
         },
         cuentaTotal: {
             type: DataTypes.INTEGER
-        },
-        correo: {
-            type: DataTypes.STRING
         },
         estado: {
             type: DataTypes.STRING

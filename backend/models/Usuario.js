@@ -21,13 +21,13 @@ export const Usuario = sequelize.define(
             type: DataTypes.STRING
         },
         fechaRegistro: {
-            type: DataTypes.DATE
+            type: DataTypes.STRING
         },
         estado: {
             type: DataTypes.STRING
         }
     }, {
         freezeTableName: true
-    });
-    Usuario.hasMany(Usuario, {foreignKey: 'usuarioId', sourcekey: 'id'});
-    Orden.belongsTo(Usuario, {foreignKey: 'usuarioId', targetkey: 'id'});
+});
+Usuario.hasMany(Orden, {foreignKey: 'usuarioId', sourcekey: 'id'});
+Orden.belongsTo(Usuario, {foreignKey: 'usuarioId', targetkey: 'id'});

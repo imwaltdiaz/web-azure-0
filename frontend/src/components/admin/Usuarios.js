@@ -40,11 +40,12 @@ export default function Usuarios() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [usuariosData, setUsuariosData] = useState([]);
   const navigate = useNavigate();
+  const URL = 'http://localhost:3080/';
 
   useEffect(() => {
     const Usuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3080/admin/usuarios', {
+        const response = await fetch(URL+'admin/usuarios', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
