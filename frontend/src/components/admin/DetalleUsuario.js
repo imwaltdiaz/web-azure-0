@@ -114,7 +114,7 @@ export default function DetalleUsuario(){
                             <TableCell>{order.id}</TableCell>
                             <TableCell>{order.fechaOrden}</TableCell>
                             <TableCell>{order.cuentaTotal}</TableCell>
-                            <TableCell>{0}</TableCell>
+                            <TableCell>{order.Productos.length}</TableCell>
                             <TableCell>{order.estado}</TableCell>
                             <TableCell>
                                 <Button color="primary" onClick={() => handleViewClick(order)}>Ver</Button>

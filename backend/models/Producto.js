@@ -1,27 +1,23 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
-import { Orden } from "./Orden.js";
-export const Usuario = sequelize.define(
-    "Usuario", {
+export const Producto = sequelize.define(
+    "Producto", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        nombre: {
+        detalle: {
             type: DataTypes.STRING
-        },
-        apellido: {
-            type: DataTypes.STRING
-        },
-        correo: {
-            type: DataTypes.STRING
-        },
-        contrasena: {
-            type: DataTypes.STRING
+        },	
+        precio: {
+            type: DataTypes.INTEGER
         },
         fechaRegistro: {
             type: DataTypes.DATE
+        },
+        stock: {
+            type: DataTypes.INTEGER
         },
         estado: {
             type: DataTypes.STRING
@@ -29,6 +25,3 @@ export const Usuario = sequelize.define(
     }, {
         freezeTableName: true
     });
-Usuario.hasMany(Orden, {foreignKey: 'usuarioId'});
-Orden.belongsTo(Usuario, {foreignKey: 'usuarioId'});
-

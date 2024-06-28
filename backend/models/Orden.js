@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
+import { Producto } from "./Producto.js";
 export const Orden = sequelize.define(
     "Orden", {
         id: {
@@ -8,7 +9,7 @@ export const Orden = sequelize.define(
             autoIncrement: true
         },
         fechaOrden: {
-            type: DataTypes.STRING
+            type: DataTypes.DATE
         },
         cuentaTotal: {
             type: DataTypes.INTEGER
@@ -21,7 +22,15 @@ export const Orden = sequelize.define(
         },
         metPago: {
             type: DataTypes.STRING
+        },
+        nroTarjeta: {
+            type: DataTypes.STRING
+        },
+        envio: {
+            type: DataTypes.STRING
         }
     }, {
         freezeTableName: true
     });
+Orden.hasMany(Producto, { foreignKey: 'ordenId' });
+Producto.belongsTo(Orden, { foreignKey: 'ordenId' });

@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 import { sequelize } from "./database/database.js";
 import { Usuario } from "./models/Usuario.js";
 import { Orden } from "./models/Orden.js";
+import { Producto } from "./models/Producto.js";
+import { or } from "sequelize";
 
 const app = express();
 const port = 3080;
@@ -35,16 +37,45 @@ app.get("/admin/usuarios/:id", async function(req, res){
     try{
         const usuario = await Usuario.findOne({
             where: {id: idUser}, include: [
-                {model: Orden, attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago"]}]});
+                {
+                  model: Orden,
+                  attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago", "nroTarjeta", "envio"],
+                  include: [
+                    {
+                      model: Producto,
+                      attributes: ["id", "nombre", "precio", "cantidad", "estado"]
+                    }
+                  ]
+                }
+              ]
+            });
         res.status(201).json(usuario);
     }catch(error){  
         res.status(400).json("Error en la BD");
     }   
 });
-app.get("/admin/usuarios", async function(req, res){
-      const usuarios = await Usuario.findAll({include: [{model: Orden, attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago"]}]});
-      res.status(201).json(usuarios);
-});
+app.get("/admin/usuarios", async function(req, res) {
+    try {
+      const usuarios = await Usuario.findAll({
+        include: [
+          {
+            model: Orden,
+            attributes: ["id", "fechaOrden", "cuentaTotal", "estado", "direccion", "metPago", "nroTarjeta", "envio"],
+            include: [
+              {
+                model: Producto,
+                attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"]
+              }
+            ]
+          }
+        ]
+      });
+      res.status(200).json(usuarios);
+    } catch (error) {
+      console.error('Error al obtener los usuarios:', error);
+      res.status(500).json({ error: 'Error al obtener los usuarios' });
+    }
+  });
 app.post("/admin/usuario", async function(req, res){
         const data = req.body;
         if(data.nombre && data.apellido && data.correo && data.contrasena && data.fechaRegistro && data.estado){
@@ -120,19 +151,22 @@ app.post("/admin/usuarios/:id/orden", async function(req, res) {
     try {
         const data = req.body;
         const idUser = req.params.id;
+        const cuenta = 0;
 
         const usuario = await Usuario.findByPk(idUser);
         if (!usuario) {
             console.log('Usuario no encontrado');
-            return res.status(404).json({ error: 'Usuario no encontrado' });
+            res.status(404).json({ error: 'Usuario no encontrado' });
         }
-        if (data.fechaOrden && data.cuentaTotal && data.estado) {
+        if (data.fechaOrden && data.estado && data.direccion && data.metPago && data.nroTarjeta && data.envio) {
             const ordenCreada = await Orden.create({
                 fechaOrden: data.fechaOrden,
-                cuentaTotal: data.cuentaTotal,
+                cuentaTotal: cuenta,
                 estado: data.estado,
                 direccion: data.direccion,
                 metPago: data.metPago,
+                nroTarjeta: data.nroTarjeta,
+                envio: data.envio,
                 usuarioId: idUser
             });
             await usuario.addOrden(ordenCreada);
@@ -140,14 +174,14 @@ app.post("/admin/usuarios/:id/orden", async function(req, res) {
                 where: { id: ordenCreada.id },
                 include: [{ model: Usuario, attributes: ["nombre", "apellido", "correo"]}]
             });
-            return res.status(201).json(result);
+            res.status(201).json(result);
         } else {
             console.log('Faltan datos en req.body:', data);
-            return res.status(400).json("Faltan datos");
+            res.status(400).json("Faltan datos");
         }
     } catch (error) {
         console.error('Error al crear la orden y asociarla al usuario:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 app.put("/admin/ordenes/:id", async function(req, res){
@@ -160,7 +194,9 @@ app.put("/admin/ordenes/:id", async function(req, res){
                 cuentaTotal: data.cuentaTotal,
                 estado: data.estado,
                 direccion: data.direccion,
-                metPago: data.metPago
+                metPago: data.metPago,
+                nroTarjeta: data.nroTarjeta,
+                envio: data.envio
             });
             res.status(201).json(orden);
         }catch(error){
@@ -176,6 +212,76 @@ app.delete("/admin/ordenes/:id", async function(req, res){
             res.status(400).send("Error en la BD");
       }
 });
+/////////////PRODUCTOS////////////////
+app.get("/admin/productos/:id", async function(req, res){
+    const idProducto = req.params.id;
+    try{
+        const producto = await Producto.findOne({where: {id: idProducto}});
+        res.status(201).json(producto);
+    }catch(error){
+        res.status(400).json("Error en la BD");
+    }
+});
+app.get("/admin/productos", async function(req, res){
+    const productos = await Producto.findAll();
+    res.status(201).json(productos);
+});
+app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, res){
+    const idUser = req.params.idUser;
+    const idOrden = req.params.idOrden;
+    try{
+        const usuario = await Usuario.findOne({where: {id: idUser}});
+        if(!usuario){
+            return res.status(404).json({error: "Usuario no encontrado"});
+        }
+        const orden = await Orden.findOne({where: {id: idOrden}});
+        if(!orden){
+            return res.status(404).json({error: "Orden no encontrada"});
+        }
+        const productos = await orden.getProductos();
+        res.json(productos);
+    }catch(error){
+        console.error("Error al obtener los productos:", error);
+        res.status(500).json({error: "Error interno del servidor"});
+    }
+});
+app.post("/admin/usuario/:idUser/orden/:idOrden/producto", async function(req, res){
+    try {
+        const data = req.body;
+        const idUser = req.params.idUser;
+        const idOrden = req.params.idOrden;
+        
+        const usuario = await Usuario.findByPk(idUser);
+        if (!usuario) {
+            console.log('Usuario no encontrado');
+            res.status(404).json({ error: 'Usuario no encontrado' });
+        }
 
+        const orden = await Orden.findOne({ where: { id: idOrden, usuarioId: idUser } });
+        if (!orden) {
+            console.log('Orden no encontrada');
+            res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        if (data.detalle && data.precio && data.fechaRegistro && data.stock && data.estado) {
+            const productoCreado = await Producto.create({
+                detalle: data.detalle,
+                precio: data.precio,
+                fechaRegistro: data.fechaRegistro,
+                stock: data.stock,
+                estado: data.estado,
+                ordenId: idOrden
+            });
+            console.log('Producto creado y asociado a la orden');
+            res.status(201).json(productoCreado);
+        } else {
+            console.log('Faltan datos en req.body:', data);
+            res.status(400).json({ error: 'Faltan datos' }, data);
+        }
+    } catch (error) {
+        console.error('Error al crear la orden y asociarla al usuario:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 
