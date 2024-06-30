@@ -11,7 +11,7 @@ function Header() {
     >
       TIENDA
     </AppBar>
-
+  
   )
 }
 export default Header;

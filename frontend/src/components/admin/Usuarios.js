@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { green, red } from '@mui/material/colors';
 
 function TablePaginationActions(props) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -43,7 +42,6 @@ export default function Usuarios() {
   const navigate = useNavigate();
   const URL = 'http://localhost:3080/';
   const [contador, setContador] = useState(1);
-  const [opcion, setOpcion] = useState("Desactivar");
 
   useEffect(() => {
     const Usuarios = async () => {
@@ -104,7 +102,6 @@ export default function Usuarios() {
       setUsuariosData(prevUsuariosData => prevUsuariosData.map(usuario =>
         usuario.id === updatedUser.id ? updatedUser : usuario
       ));
-      setOpcion(nuevoEstado === "Inactivo" ? "Activar" : "Desactivar");
     } catch (error) {
       console.error('Error al actualizar el estado del usuario:', error);
     }
@@ -158,7 +155,7 @@ export default function Usuarios() {
                   <TableCell>{user.estado}</TableCell>
                   <TableCell>
                       <Button onClick={() => handleClickVer(user)}>Ver</Button>{' | '}
-                      <Button onClick={() => handleClickActivar(user)}>{opcion}</Button>
+                      <Button onClick={() => handleClickActivar(user)}>{user.estado === "Activo" ? "Desactivar" : "Activar"}</Button>
                   </TableCell>
                 </TableRow>
               ))}

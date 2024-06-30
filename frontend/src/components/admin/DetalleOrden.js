@@ -10,9 +10,9 @@ export default function DetalleOrden(){
     const [metPago, setMetPago] = useState(order?.metPago || '');
     const [nroTarjeta, setNroTarjeta] = useState(order?.nroTarjeta || '');
     const [cuentaTotal, setCuentaTotal] = useState(order?.cuentaTotal || '');
-    const [envio, setEnvio] = useState(order?.envio || []);
-    const [producto, setProducto] = useState(order?.Productos || []);
-    const SubTotal = producto.reduce((acc, prod) => acc + prod.precio * prod.stock, 0);
+    const [envio, setEnvio] = useState(order?.envio || '');
+    const [producto, setProducto] = useState(order?.Orden_Productos || []);
+    const SubTotal = producto.reduce((acc, prod) => acc + prod.Producto.precio * prod.Producto.stock, 0);
     const Impuestos = 18;
     const Total = SubTotal + (envio === "Economico" ? 10 : 17) + Impuestos;
 
@@ -46,9 +46,27 @@ export default function DetalleOrden(){
         }
         deleteOrden();
     }
-
+    async function ActualizarTotal(){
+        try {
+            const response = await fetch('http://localhost:3080/admin/ordenes/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cuentaTotal: Total
+                })
+            });
+            if (!response.ok) {
+                throw new Error('Error al actualizar el total de la orden');
+            }
+        } catch (error) {
+            console.error('Hubo un error al actualizar el total de la orden', error);
+        }
+    }
+    ActualizarTotal();
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "30px"}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "30px", justifyContent: "center"}}>
             <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw">
                 <Typography variant="h6" component="div" sx={{ paddingTop: "15px", paddingBottom: "15px" }}>
                     Detalles de Orden 
@@ -74,9 +92,9 @@ export default function DetalleOrden(){
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: 'skyblue',
-                    width: '38vw',
+                    paddingLeft: "2vw",
+                    width: '36vw',
                     height: '20vh',
-
                     }}>
                         <p><b>Direccion de envio</b></p>
                         <p>{direccion}</p>
@@ -85,8 +103,10 @@ export default function DetalleOrden(){
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: 'skyblue',
-                    width: '38vw',
+                    paddingLeft: "2vw",
+                    width: '36vw',
                     height: '20vh',
+                    alignContent: 'center'
                     }}>
                         <p><b>Pago</b></p>
                         <FormControl>
@@ -94,13 +114,12 @@ export default function DetalleOrden(){
                                 aria-labelledby="radio-buttons-group"
                                 defaultValue={metPago}
                             >
-                            <FormControlLabel value="Qr" control={<Radio />} label="Pago con QR" />
-                            <FormControlLabel value="Tarjeta" control={<Radio />} label="Pago con tarjeta de credito"/>
+                            <FormControlLabel value="QR" control={<Radio disabled />} label="Pago con QR" />
+                            <FormControlLabel value="Tarjeta" control={<Radio disabled />} label="Pago con tarjeta de credito"/>
                             </RadioGroup>
                         </FormControl>
                     <Stack direction="row" justifyContent="space-between">
-                        <p>Tarjeta de Credito que termina en:   </p>
-                        <p>{OfuscarNumero(nroTarjeta)}</p>
+                        <p>Tarjeta de Credito que termina en: {OfuscarNumero(nroTarjeta)}</p>
                     </Stack>  
                     </Box>
                 </Stack>
@@ -129,17 +148,18 @@ export default function DetalleOrden(){
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: 'skyblue',
-                    width: '77vw',
+                    paddingLeft: "2vw",
+                    width: '76vw',
                     height: '5vh',
-                    paddingRight: "1vw",
+                    alignContent: 'center',
                 }}>
                     <FormControl>
                         <RadioGroup
                             aria-labelledby="radio-buttons-group"
                             defaultValue={envio}
                         ><Stack direction="row">
-                            <FormControlLabel value="Economico" control={<Radio />} label="Economico Aereo - S/10" />
-                            <FormControlLabel value="Prioritario" control={<Radio />} label="Envio Prioritario (5 a 10 dias) - S/17"/>
+                            <FormControlLabel value="Economico" control={<Radio disabled />} label="Economico Aereo - S/10" />
+                            <FormControlLabel value="Prioritario" control={<Radio disabled />} label="Envio Prioritario (5 a 10 dias) - S/17"/>
                         </Stack></RadioGroup>
                     </FormControl>
                 </Box>
@@ -153,28 +173,30 @@ export default function DetalleOrden(){
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: 'skyblue',
-                    width: '38vw',
+                    paddingLeft: "2vw",
+                    width: '36vw',
                     height: '25vh'
                     }}>
                         <p><b>Items en pedidos</b></p>
                         <ul>
                             {producto.map((prod) => (
-                                <li>{prod.stock}{"x  "}{prod.detalle}</li>
-                            ))} 
+                                <li key={prod.id}>{prod.Producto.stock}{" x "}{prod.Producto.detalle}</li>
+                            ))}
                         </ul>
                     </Box>
                     <Box sx={{
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: 'skyblue',
-                    width: '38vw',
+                    paddingLeft: "2vw",
+                    width: '36vw',
                     height: '25vh'
                     }}>
                         <p><b>Resumen del pedido</b></p>
                         <p>SubTotal: S/{SubTotal}</p>
                         <p>Envio: S/{envio === "Economico" ? 10 : 17}</p>
                         <p>Impuestos: S/{Impuestos}</p>
-                        <p>Total: S/{cuentaTotal}</p>
+                        <p>Total: S/{Total}</p>
                         <center><Button variant="contained" onClick={() => handleViewEliminar(id)}>Cancelar Pedido</Button></center>
                     </Box>
                 </Stack>

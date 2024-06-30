@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "../common/header";
+import Header_salir from "../common/header_logout";
 import Footer from "../common/footer";
 import { Stack } from "@mui/material";
 import DrawerDev from "./DrawerDev";
@@ -14,11 +15,14 @@ import data from './data.json';
 import Ordenes from "./Ordenes";
 import DetalleUsuario from "./DetalleUsuario";
 import DetalleOrden from "./DetalleOrden";
+import { useLocation } from "react-router-dom";
 
 export default function AdminMain() {
+  const location = useLocation();
+  const isUsuariosPage = location.pathname === "/admin/usuarios";
   return (
     <>
-      <Header />
+      {isUsuariosPage ? <Header_salir /> : <Header />}
       <Stack
         direction="row"
         justifyContent="flex-start"

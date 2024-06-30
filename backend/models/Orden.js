@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
+import { Orden_Producto } from "./Orden_Producto.js";
 import { Producto } from "./Producto.js";
 export const Orden = sequelize.define(
     "Orden", {
@@ -32,5 +33,9 @@ export const Orden = sequelize.define(
     }, {
         freezeTableName: true
     });
-Orden.hasMany(Producto, { foreignKey: 'ordenId' });
-Producto.belongsTo(Orden, { foreignKey: 'ordenId' });
+Orden.belongsToMany(Producto, { through: Orden_Producto, foreignKey: 'ordenId' });
+Producto.belongsToMany(Orden, { through: Orden_Producto, foreignKey: 'productoId' });
+Orden.hasMany(Orden_Producto, { foreignKey: 'ordenId' });
+Orden_Producto.belongsTo(Orden, { foreignKey: 'ordenId' });
+Producto.hasMany(Orden_Producto, { foreignKey: 'productoId' });
+Orden_Producto.belongsTo(Producto, { foreignKey: 'productoId' });

@@ -59,7 +59,9 @@ export default function DetalleUsuario(){
 
     const handleViewClick = (order) => {
         navigate(`/admin/orden/${order.id}`, { state: { order } });
-    };   
+    };
+    
+    
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px"}}>
             <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" sx={{ flexGrow: 1 }}>
@@ -114,7 +116,7 @@ export default function DetalleUsuario(){
                             <TableCell>{order.id}</TableCell>
                             <TableCell>{order.fechaOrden}</TableCell>
                             <TableCell>{order.cuentaTotal}</TableCell>
-                            <TableCell>{order.Productos.length}</TableCell>
+                            <TableCell>  {order.Orden_Productos ? order.Orden_Productos.length : 0}</TableCell>
                             <TableCell>{order.estado}</TableCell>
                             <TableCell>
                                 <Button color="primary" onClick={() => handleViewClick(order)}>Ver</Button>
