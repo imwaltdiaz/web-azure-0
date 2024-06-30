@@ -6,6 +6,7 @@ import { Usuario } from "./models/Usuario.js";
 import { Orden } from "./models/Orden.js";
 import { Producto } from "./models/Producto.js";
 import { Orden_Producto } from "./models/Orden_Producto.js";
+import { Serie } from "./models/Serie.js";
 import { or } from "sequelize";
 
 const app = express();
@@ -338,5 +339,103 @@ app.post("/admin/usuario/:idUser/orden/:idOrden/producto", async function(req, r
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
+
+  
+app.post("/admin/productos", async function(req, res) {
+  try {
+      const { detalle, precio, fechaRegistro, stock, estado } = req.body;
+      const nuevoProducto = await Producto.create({
+          detalle,
+          precio,
+          fechaRegistro: fechaRegistro || new Date(), // Asigna la fecha actual si no se proporciona
+          stock,
+          estado
+      });
+      res.status(201).json(nuevoProducto);
+  } catch (error) {
+      console.error('Error al crear el producto:', error);
+      res.status(500).json({ error: 'Error al crear el producto' });
+  }
+});
+
+
+/////////////SERIES////////////////
+app.get("/admin/series", async function(req, res) {
+  try {
+      const series = await Serie.findAll({
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+              }
+          ]
+      });
+      res.status(200).json(series);
+  } catch (error) {
+      console.error('Error al obtener las series:', error);
+      res.status(500).json({ error: 'Error al obtener las series' });
+  }
+});
+
+app.get("/admin/series/:id", async function(req, res) {
+  const idSerie = req.params.id;
+  try {
+      const serie = await Serie.findOne({
+          where: { id: idSerie },
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+              }
+          ]
+      });
+      res.status(200).json(serie);
+  } catch (error) {
+      console.error('Error al obtener la serie:', error);
+      res.status(500).json({ error: 'Error al obtener la serie' });
+  }
+});
+
+app.post("/admin/series", async function(req, res) {
+  try {
+      const { nombre, descripcion, productos } = req.body;
+      const nuevaSerie = await Serie.create({ nombre, descripcion });
+      if (productos && productos.length > 0) {
+          await nuevaSerie.setProductos(productos);
+      }
+      res.status(201).json(nuevaSerie);
+  } catch (error) {
+      console.error('Error al crear la serie:', error);
+      res.status(500).json({ error: 'Error al crear la serie' });
+  }
+});
+
+app.put("/admin/series/:id", async function(req, res) {
+  const idSerie = req.params.id;
+  try {
+      const { nombre, descripcion, productos } = req.body;
+      const serie = await Serie.findOne({ where: { id: idSerie } });
+      await serie.update({ nombre, descripcion });
+      if (productos && productos.length > 0) {
+          await serie.setProductos(productos);
+      }
+      res.status(200).json(serie);
+  } catch (error) {
+      console.error('Error al actualizar la serie:', error);
+      res.status(500).json({ error: 'Error al actualizar la serie' });
+  }
+});
+
+app.delete("/admin/series/:id", async function(req, res) {
+  const idSerie = req.params.id;
+  try {
+      await Serie.destroy({ where: { id: idSerie } });
+      res.status(200).send("Serie eliminada");
+  } catch (error) {
+      console.error('Error al eliminar la serie:', error);
+      res.status(500).json({ error: 'Error al eliminar la serie' });
+  }
+});
+
 
 
