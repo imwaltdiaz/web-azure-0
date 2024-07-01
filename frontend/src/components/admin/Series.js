@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import seriesData from './seriesData.json'; // Importa los datos desde el JSON
 
 function TablePaginationActions(props) {
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -37,10 +36,15 @@ function TablePaginationActions(props) {
 
 export default function Series() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState(seriesData);
+  const [filteredData, setFilteredData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [seriesData, setSeriesData] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchSeries();
+  }, []);
 
   useEffect(() => {
     setFilteredData(
@@ -50,7 +54,17 @@ export default function Series() {
         serie.id.toString().includes(searchTerm)
       )
     );
-  }, [searchTerm]);
+  }, [searchTerm, seriesData]);
+
+  const fetchSeries = async () => {
+    try {
+      const response = await fetch('http://localhost:3080/admin/series');
+      const data = await response.json();
+      setSeriesData(data);
+    } catch (error) {
+      console.error('Error al obtener las series:', error);
+    }
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -101,8 +115,8 @@ export default function Series() {
                   <TableCell>{serie.id}</TableCell>
                   <TableCell>{serie.nombre}</TableCell>
                   <TableCell>{serie.descripcion}</TableCell>
-                  <TableCell>{serie.fechaCreacion}</TableCell>
-                  <TableCell>{serie.numProductos}</TableCell>
+                  <TableCell>{serie.fechaRegistro}</TableCell>
+                  <TableCell>{serie.NroProductos}</TableCell>
                   <TableCell>
                     <Button color="primary" onClick={() => handleViewClick(serie)}>Ver</Button>
                   </TableCell>
