@@ -367,18 +367,34 @@ app.post("/admin/series", async function(req, res) {
 app.put("/admin/series/:id", async function(req, res) {
   const idSerie = req.params.id;
   try {
-      const { nombre, descripcion, productos } = req.body;
-      const serie = await Serie.findOne({ where: { id: idSerie } });
-      await serie.update({ nombre, descripcion });
-      if (productos && productos.length > 0) {
-          await serie.setProductos(productos);
+    const { nombre, descripcion, productos } = req.body;
+    const serie = await Serie.findOne({ where: { id: idSerie } });
+    await serie.update({ nombre, descripcion });
+
+    if (productos && productos.length > 0) {
+      for (const productoId of productos) {
+        const producto = await Producto.findByPk(productoId);
+        await serie.addProducto(producto);
       }
-      res.status(200).json(serie);
+    }
+
+    const serieActualizada = await Serie.findOne({
+      where: { id: idSerie },
+      include: [
+        {
+          model: Producto,
+          attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+        }
+      ]
+    });
+
+    res.status(200).json(serieActualizada);
   } catch (error) {
       console.error('Error al actualizar la serie:', error);
       res.status(500).json({ error: 'Error al actualizar la serie' });
   }
 });
+
 
 app.delete("/admin/series/:id", async function(req, res) {
   const idSerie = req.params.id;
