@@ -23,13 +23,13 @@ export const Orden = sequelize.define(
             type: DataTypes.STRING
         },
         metPago: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING //Solo opciones palabras "Tarjeta" o "QR"
         },
         nroTarjeta: {
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER
         },
         envio: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING //Solo opciones palabras "Economico" o "Prioritario"
         }
     }, {
         freezeTableName: true
