@@ -108,7 +108,7 @@ export default function Usuarios() {
   };
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px"}}>
-      <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" sx={{ flexGrow: 1 }}>
+      <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" paddingRight="2vw" sx={{ flexGrow: 1 }}>
         <Box sx={{
             paddingBottom: "8px",
             paddingTop: "8px",
@@ -141,7 +141,7 @@ export default function Usuarios() {
                 <TableCell>Correo</TableCell>
                 <TableCell>Fecha de registro</TableCell>
                 <TableCell>Estado</TableCell>
-                <TableCell justifyContent="center">Acciones</TableCell> 
+                <TableCell>Acciones</TableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
