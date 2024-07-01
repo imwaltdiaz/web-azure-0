@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
-import { Orden_Producto } from "./Orden_Producto.js";
 export const Producto = sequelize.define(
     "Producto", {
         id: {
@@ -15,7 +14,8 @@ export const Producto = sequelize.define(
             type: DataTypes.INTEGER
         },
         fechaRegistro: {
-            type: DataTypes.DATE
+            type: DataTypes.DATEONLY,
+            defaultValue: DataTypes.NOW
         },
         stock: {
             type: DataTypes.INTEGER

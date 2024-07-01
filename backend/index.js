@@ -93,13 +93,12 @@ app.post("/admin/usuario", async function(req, res){
     try {    
         const data = req.body;
         const estadodefault = "Activo"
-        if(data.nombre && data.apellido && data.correo && data.contrasena && data.fechaRegistro){
+        if(data.nombre && data.apellido && data.correo && data.contrasena){
             const usuarioCreado = await Usuario.create({
                 nombre: data.nombre,
                 apellido: data.apellido,
                 correo: data.correo,
                 contrasena: data.contrasena,
-                fechaRegistro: data.fechaRegistro,
                 estado: estadodefault
             });
             res.status(201).json(usuarioCreado);
@@ -198,9 +197,8 @@ app.post("/admin/usuarios/:id/orden", async function(req, res) {
             console.log('Usuario no encontrado');
             res.status(404).json({ error: 'Usuario no encontrado' });
         }
-        if (data.fechaOrden && data.estado && data.direccion && data.metPago && data.nroTarjeta && data.envio) {
+        if (data.direccion && data.metPago && data.nroTarjeta && data.envio) {
             const ordenCreada = await Orden.create({
-                fechaOrden: data.fechaOrden,
                 cuentaTotal: cuenta,
                 estado: estadodefault,
                 direccion: data.direccion,
@@ -298,49 +296,7 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
       console.error("Error al obtener los productos:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
-  });
-app.post("/admin/usuario/:idUser/orden/:idOrden/producto", async function(req, res) {
-    try {
-      const data = req.body;
-      const idUser = req.params.idUser;
-      const idOrden = req.params.idOrden;
-      
-      const usuario = await Usuario.findByPk(idUser);
-      if (!usuario) {
-        console.log('Usuario no encontrado');
-        return res.status(404).json({ error: 'Usuario no encontrado' });
-      }
-  
-      const orden = await Orden.findOne({ where: { id: idOrden, usuarioId: idUser } });
-      if (!orden) {
-        console.log('Orden no encontrada');
-        return res.status(404).json({ error: 'Orden no encontrada' });
-      }
-  
-      if (data.detalle && data.precio && data.fechaRegistro && data.stock && data.estado ) {
-        const productoCreado = await Producto.create({
-          detalle: data.detalle,
-          precio: data.precio,
-          fechaRegistro: data.fechaRegistro,
-          stock: data.stock,
-          estado: data.estado,
-          ordenId: idOrden
-        });
-  
-        await orden.addProducto(productoCreado, { through: {} });
-        console.log('Producto creado y asociado a la orden');
-        res.status(201).json(productoCreado);
-      } else {
-        console.log('Faltan datos en req.body:', data);
-        res.status(400).json({ error: 'Faltan datos', data });
-      }
-    } catch (error) {
-      console.error('Error al crear el producto y asociarlo a la orden:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
-
-  
+  }); 
 app.post("/admin/productos", async function(req, res) {
   try {
       const { detalle, precio, fechaRegistro, stock, estado } = req.body;
@@ -357,8 +313,6 @@ app.post("/admin/productos", async function(req, res) {
       res.status(500).json({ error: 'Error al crear el producto' });
   }
 });
-
-
 /////////////SERIES////////////////
 app.get("/admin/series", async function(req, res) {
   try {

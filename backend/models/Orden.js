@@ -10,7 +10,8 @@ export const Orden = sequelize.define(
             autoIncrement: true
         },
         fechaOrden: {
-            type: DataTypes.DATE
+            type: DataTypes.DATEONLY,
+            defaultValue: DataTypes.NOW
         },
         cuentaTotal: {
             type: DataTypes.INTEGER

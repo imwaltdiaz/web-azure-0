@@ -21,7 +21,8 @@ export const Usuario = sequelize.define(
             type: DataTypes.STRING
         },
         fechaRegistro: {
-            type: DataTypes.DATE
+            type: DataTypes.DATEONLY,
+            defaultValue: DataTypes.NOW
         },
         estado: {
             type: DataTypes.STRING
