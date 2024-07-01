@@ -223,25 +223,40 @@ app.post("/admin/usuarios/:id/orden", async function(req, res) {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
-app.put("/admin/ordenes/:id", async function(req, res){
-        const idOrden = req.params.id;
-        const data = req.body;
-        try{
-            const orden = await Orden.findOne({where: {id: idOrden}});
-            await orden.update({
-                fechaOrden: data.fechaOrden,
-                cuentaTotal: data.cuentaTotal,
-                estado: data.estado,
-                direccion: data.direccion,
-                metPago: data.metPago,
-                nroTarjeta: data.nroTarjeta,
-                envio: data.envio
-            });
-            res.status(201).json(orden);
-        }catch(error){
-            res.status(400).json("Error en la BD");
-        }
+app.put("/admin/ordenes/:id", async function(req, res) {
+  const idOrden = req.params.id;
+  const { productos, ...data } = req.body;
+  try {
+      const orden = await Orden.findOne({ where: { id: idOrden } });
+      await orden.update(data);
+
+      if (productos && productos.length > 0) {
+          for (const productoId of productos) {
+              const producto = await Producto.findByPk(productoId);
+              if (producto) {
+                  await Orden_Producto.create({ ordenId: orden.id, productoId: producto.id });
+              }
+          }
+      }
+
+      const ordenActualizada = await Orden.findOne({
+          where: { id: idOrden },
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+              }
+          ]
+      });
+
+      res.status(200).json(ordenActualizada);
+  } catch (error) {
+      console.error('Error al actualizar la orden:', error);
+      res.status(500).json({ error: 'Error al actualizar la orden' });
+  }
 });
+
+
 app.delete("/admin/ordenes/:id", async function(req, res){
       const idOrden = req.params.id;
       try{
