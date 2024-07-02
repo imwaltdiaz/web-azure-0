@@ -14,6 +14,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import { styled } from '@mui/material/styles';
 
 
+
 export default function ItemsCheckOut() {
   return (
     <>
@@ -24,6 +25,16 @@ export default function ItemsCheckOut() {
       <Box component="section" sx={{ p: 1, border: '1px solid black', background :'#C2C1C1'}}>
         Datos de compra
       </Box>
+      <Box display={'flex'} justifyContent={'space-evenly'}>
+        <BoxDireccion/>
+        <BoxPago/>
+      </Box>
+      <MetodoEnvio/>
+      <Box display={'flex'} justifyContent={'space-evenly'}>
+        <BoxItem/>
+        <BoxResOrd/>
+      </Box>
+      <Footer/>
       
     </>
   );
@@ -98,7 +109,7 @@ export function BoxPago() {
       <Box
         sx={{
         display: 'flex',
-        gap: 2, // Espacio entre los elementos
+        gap: 2, 
     }}
     >
         <TextField type="date" label="" variant="outlined" />
@@ -118,17 +129,17 @@ export function BoxItem({nombre,precio}) {
         display="flex"
         flexDirection="column"
         alignItems="right"
-        justifyContent="space-between"
-        gap={2}
+        justifyContent="center"
+        gap={6}
         p={2}
         sx={{ border: '2px solid grey' }}
       >            
         <FormLabel><b>Items en Pedido</b></FormLabel>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+        <Box display="flex" flexDirection="column" alignItems="center"  gap={2}>
         <Box display="flex" flexDirection="row" justifyContent="space-around" width="60%">
           <Stack direction="column" spacing={3}>
-            <Typography variant="body1">{nombre}</Typography>
-            <Typography variant="body1">{nombre}</Typography>
+            <Typography variant="body1">aaa</Typography>
+            <Typography variant="body1">aaa</Typography>
           </Stack>
           <Stack direction="column" spacing={3}>
             <Typography variant="body1">{`S/ ${precio}`}</Typography>
@@ -170,12 +181,12 @@ export function BoxResOrd({ subtotal, envio, impuestos, total }) {
             <Typography variant="body1">{`S/ ${total}`}</Typography>
           </Stack>
         </Box>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" href='/pedidoCompleto'>
           Completar orden
         </Button>
       </Box>
     </Box>
-    <Footer/>
+    
     </>
   );
 }

@@ -1,60 +1,91 @@
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import AspectRatio from '@mui/joy/AspectRatio';
+import Button from '@mui/material/Button';
 import Footer from '../common/footer';
 import Header2 from '../user/headerU';
-import Link from '@mui/joy/Link';
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
-import Divider from '@mui/material/Divider';
-import { Stack } from '@mui/material';
-import ListaItemCarr from '../common/ObjCarrito';
+import ListaItemCarr, { ListaSavedICar } from '../common/ObjCarrito';
 
 export default function ItemsCarro() {
+  const [items, setItems] = React.useState([
+    {
+      imagen: 'https://electroluxpe.vtexassets.com/arquivos/ids/159279/Blender_EBS20_Perspective_Electrolux_1000x1000.jpg?v=637888545873470000',
+      nombre: 'nombre1',
+      cant: 'cant',
+      prize: 'prize',
+      subtot: 'ubtot',
+    },
+    {
+      imagen: 'https://falabella.scene7.com/is/image/FalabellaPE/gsc_115244582_1055792_1?wid=1500&hei=1500&qlt=70',
+      nombre: 'nombre2',
+      cant: 'cant',
+      prize: 'prize',
+      subtot: 'ubtot',
+    },
+  ]);
+
+  const [savedItems, setSavedItems] = React.useState([]);
+
+  const handleSaveForLater = (item) => {
+    setSavedItems((prevItems) => [...prevItems, item]);
+    setItems((prevItems) => prevItems.filter((i) => i!== item));
+  };
+
+  const handleRemoveItem = (item) => {
+    setItems(items.filter((i) => i!== item));
+    setSavedItems(savedItems.filter((i) => i!== item));
+  };
+
+  const handleMoveItem = (item) => {
+    setItems((prevItems) => [...prevItems, item]);
+    setSavedItems((prevSavedItems) => prevSavedItems.filter((i) => i!== item));
+  };
+
   return (
     <>
-    <Header2/>
+      <Header2 />
       <Typography variant="h4" component="p">
         Items en tu Carrito de Compras
       </Typography>
       <Box component="section" sx={{ p: 2, border: '1px solid black', background: '#C2C1C1' }}>
         Items Disponible para Envio
       </Box>
-    </>
-  );
-}
-
-export function Compil() {
-  return (
-    <>
-      <ListaItemCarr
-        imagen="https://blog.bangbranding.com/wp-content/uploads/2016/11/700x511_SliderInterior.jpg"
-        nombre="nombre1"
-        cant="cant"
-        prize="prize"
-        subtot="subtot"
-      />
-    </>
-  );
-}
-export function BtnPago() {
-  return (
-    <><>
+      {items.map((item, index) => (
+        <ListaItemCarr
+          key={index}
+          imagen={item.imagen}
+          nombre={item.nombre}
+          cant={item.cant}
+          prize={item.prize}
+          subtot={item.subtot}
+          onSaveForLater={() => handleSaveForLater(item)}
+          onRemoveItem={() => handleRemoveItem(item)}
+        />
+      ))}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: '50px', marginBottom: '20px' }}>
         <Typography variant="h5" component="p" alignItems={"flex-end"}>
           Total: S/ 100
         </Typography>
-        <button>Checkout</button>
+        <Button href="/checkout" sx={{ border: '2px solid', backgroundColor: 'lightgrey' }}>
+          Checkout
+        </Button>
       </Box>
       <Box component="section" sx={{ p: 1, border: '1px solid black', background: '#C2C1C1', marginTop: '20px' }}>
-        Datos de compra
+        Guardado para después
       </Box>
-
-    </><Footer /></>
+      {savedItems.map((item, index) => (
+        <ListaSavedICar
+          key={index}
+          imagen={item.imagen}
+          nombre={item.nombre}
+          cant={item.cant}
+          prize={item.prize}
+          subtot={item.subtot}
+          onMoveToCart={() => handleMoveItem(item)}
+          onRemoveItem={() => handleRemoveItem(item)}
+        />
+      ))}
+      <Footer />
+    </>
   );
 }
-
-
-
-
