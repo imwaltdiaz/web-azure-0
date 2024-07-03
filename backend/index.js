@@ -34,6 +34,9 @@ app.listen(port, function() {
   verificarConexion();
 });
 /////////////USUARIOS////////////////
+app.get("/", function(req, res){
+    res.send("Hola mundo");
+});
 app.get("/admin/usuarios/:id", async function(req, res) {
     const idUser = req.params.id;
     try {
