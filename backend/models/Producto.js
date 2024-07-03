@@ -7,22 +7,47 @@ export const Producto = sequelize.define(
             primaryKey: true,
             autoIncrement: true
         },
+        nombre: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         detalle: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
         },	
         precio: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
         fechaRegistro: {
             type: DataTypes.DATEONLY,
             defaultValue: DataTypes.NOW
         },
         stock: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
         estado: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        tipo: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        imagen: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        serie: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        marca: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
+
     }, {
         freezeTableName: true
     });

@@ -5,7 +5,7 @@ import Card from '@mui/joy/Card';
 import CardContent from '@mui/joy/CardContent';
 import { Stack } from '@mui/material';
 
-export default function ListaItemCarr({ imagen, nombre, fabricante, precio }) {
+export default function ListaItemCarr({ imagen, nombre, serie, fabricante, precio }) {
     return (
       <Card
         variant="outlined"
@@ -44,7 +44,7 @@ export default function ListaItemCarr({ imagen, nombre, fabricante, precio }) {
                 {nombre}
               </Typography>
               <Typography variant="h6" id="card-description">
-                Por: {fabricante}
+                Por: {fabricante} {" - Serie: "+ serie}
               </Typography>
               <Typography variant="h4" id="card-description" fontWeight="bold" sx={{marginTop : 1}}>
                 S/{precio}

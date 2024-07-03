@@ -3,7 +3,27 @@ import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import IconButton from '@mui/material/IconButton';
+import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
 function Header2() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handlerClickMV = () => {
+    setSearchQuery("coleccion")
+    navigate("/busqueda", {state: {searchQuery}});
+  };
+
+  const handlerClickO = () => {
+    setSearchQuery("oferta")
+    navigate("/busqueda", {state: {searchQuery}});
+  };
+
+  const handlerClickN = () => {
+    setSearchQuery("nuevo")
+    navigate("/busqueda", {state: {searchQuery}});
+  };
+
   return (
     <>
       <AppBar position="static"
@@ -17,9 +37,9 @@ function Header2() {
           <Button href="/" variant="h1" sx={{fontWeight : 'bold', fontSize : '30px'}}>
             TIENDA
           </Button>
-          <Button color="inherit" href="/busqueda" sx={{mx : '20px'}}>Mas vendidos</Button>
-          <Button color="inherit" href="#Nuevos" sx={{mx : '20px'}}>Nuevos</Button>
-          <Button color="inherit" href="/busqueda" sx={{mx : '20px'}}>Ofertas</Button>
+          <Button color="inherit" onClick={handlerClickMV} sx={{mx : '20px'}}>Mas vendidos</Button>
+          <Button color="inherit" onClick={handlerClickN} sx={{mx : '20px'}}>Nuevos</Button>
+          <Button color="inherit" onClick={handlerClickO} sx={{mx : '20px'}}>Ofertas</Button>
           <Box sx={{flexGrow : 1}}/>
           <IconButton color="withe" href="/carritoDeCompras">
             <LocalGroceryStoreIcon/>
