@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,35 +14,97 @@ export default function AgregarSerie() {
   const [searchTerm, setSearchTerm] = useState('');
   const [availableProducts, setAvailableProducts] = useState([]);
 
+  useEffect(() => {
+    if (serie && serie.id) {
+      fetchSeriesProducts(serie.id);
+    }
+  }, [serie]);
+
+  const fetchSeriesProducts = async (serieId) => {
+    try {
+      const response = await fetch(`http://localhost:3080/admin/series/${serieId}`);
+      const data = await response.json();
+      setNombre(data.nombre);
+      setDescripcion(data.descripcion);
+      setProductos(data.Productos || []);
+    } catch (error) {
+      console.error('Error al obtener la serie:', error);
+    }
+  };
+
   const handleAddProduct = () => {
     setOpen(true);
   };
 
-  const handleRemoveProduct = (product) => {
-    setProductos(productos.filter(p => p.id !== product.id));
+  const handleRemoveProduct = async (product) => {
+    try {
+      if (serie && serie.id) {
+        await fetch(`http://localhost:3080/admin/series/${serie.id}/productos/${product.id}`, {
+          method: 'DELETE'
+        });
+      }
+      setProductos(productos.filter(p => p.id !== product.id));
+    } catch (error) {
+      console.error('Error al remover el producto:', error);
+    }
   };
 
-  const handleGuardarClick = () => {
-    navigate('/admin/series');
+  const handleGuardarClick = async () => {
+    const serieData = {
+      nombre,
+      descripcion,
+      productos: productos.map(p => p.id)
+    };
+
+    try {
+      if (serie && serie.id) {
+        await fetch(`http://localhost:3080/admin/series/${serie.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(serieData)
+        });
+      } else {
+        await fetch('http://localhost:3080/admin/series', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(serieData)
+        });
+      }
+      navigate('/admin/series');
+    } catch (error) {
+      console.error('Error al guardar la serie:', error);
+    }
   };
 
   const handleSearch = async () => {
-    // Aquí deberías hacer la llamada a la base de datos para buscar los productos
-    // Para la demostración, usaré un conjunto de datos estático
-    const fetchedProducts = [
-      { id: 1, descripcion: 'Manga Dragon Ball Vol 1' },
-      { id: 2, descripcion: 'Manga Dragon Ball Vol 2' }
-    ];
-
-    setAvailableProducts(fetchedProducts.filter(product =>
-      product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.id.toString().includes(searchTerm)
-    ));
+    try {
+      const response = await fetch('http://localhost:3080/admin/productos');
+      const data = await response.json();
+      setAvailableProducts(data.filter(product =>
+        product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.id.toString().includes(searchTerm)
+      ));
+    } catch (error) {
+      console.error('Error al buscar productos:', error);
+    }
   };
 
-  const handleAddToSerie = (product) => {
-    setProductos([...productos, product]);
-    setOpen(false);
+  const handleAddToSerie = async (product) => {
+    try {
+      if (serie && serie.id) {
+        await fetch(`http://localhost:3080/admin/series/${serie.id}/productos/${product.id}`, {
+          method: 'POST'
+        });
+      }
+      setProductos([...productos, product]);
+      setOpen(false);
+    } catch (error) {
+      console.error('Error al agregar el producto a la serie:', error);
+    }
   };
 
   return (
@@ -132,15 +194,21 @@ export default function AgregarSerie() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {availableProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
-                    <TableCell>{product.descripcion}</TableCell>
-                    <TableCell>
-                      <Button color="primary" onClick={() => handleAddToSerie(product)}>Agregar</Button>
-                    </TableCell>
+                {availableProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">No se encontraron productos</TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  availableProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.id}</TableCell>
+                      <TableCell>{product.descripcion}</TableCell>
+                      <TableCell>
+                        <Button color="primary" onClick={() => handleAddToSerie(product)}>Agregar</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>

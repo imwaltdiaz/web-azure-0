@@ -25,7 +25,9 @@ export const Usuario = sequelize.define(
             defaultValue: DataTypes.NOW
         },
         estado: {
-            type: DataTypes.STRING
+            type: Sequelize.STRING,
+            allowNull: false,
+            defaultValue: 'Activo'
         }
     }, {
         freezeTableName: true

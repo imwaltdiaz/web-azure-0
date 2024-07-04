@@ -91,10 +91,10 @@ app.get("/admin/usuarios", async function(req, res) {
       res.status(500).json({ error: 'Error al obtener los usuarios' });
     }
   });
-app.post("/admin/usuario", async function(req, res){
+  app.post("/admin/usuario", async function(req, res){
     try {    
         const data = req.body;
-        const estadodefault = "Activo"
+        const estadodefault = "Activo";
         if(data.nombre && data.apellido && data.correo && data.contrasena){
             const usuarioCreado = await Usuario.create({
                 nombre: data.nombre,
@@ -104,12 +104,13 @@ app.post("/admin/usuario", async function(req, res){
                 estado: estadodefault
             });
             res.status(201).json(usuarioCreado);
-            console.log("Usuario creado")
+            console.log("Usuario creado");
         }else{
             res.status(400).json("Faltan datos");
         }
     }catch(error){
-        res.status(400).json("Error en la BD");
+        console.error('Error al crear el usuario:', error.message);
+        res.status(500).json({ error: 'Error en la BD', details: error.message });
     }
 });
 app.put("/admin/usuarios/:id", async function(req, res){
@@ -374,7 +375,7 @@ app.post("/admin/series", async function(req, res) {
       const { nombre, descripcion, productos } = req.body;
       const nuevaSerie = await Serie.create({ nombre, descripcion });
       if (productos && productos.length > 0) {
-          await nuevaSerie.setProductos(productos);
+          await nuevaSerie.addProductos(productos);
       }
       res.status(201).json(nuevaSerie);
   } catch (error) {
@@ -414,7 +415,6 @@ app.put("/admin/series/:id", async function(req, res) {
   }
 });
 
-
 app.delete("/admin/series/:id", async function(req, res) {
   const idSerie = req.params.id;
   try {
@@ -426,3 +426,22 @@ app.delete("/admin/series/:id", async function(req, res) {
   }
 });
 
+app.delete("/admin/series/:id/productos/:productoId", async function(req, res) {
+  const idSerie = req.params.id;
+  const productoId = req.params.productoId;
+  try {
+      const serie = await Serie.findByPk(idSerie);
+      if (!serie) {
+          return res.status(404).json({ error: 'Serie no encontrada' });
+      }
+      const producto = await Producto.findByPk(productoId);
+      if (!producto) {
+          return res.status(404).json({ error: 'Producto no encontrado' });
+      }
+      await serie.removeProducto(producto);
+      res.status(200).send("Producto removido de la serie");
+  } catch (error) {
+      console.error('Error al remover el producto de la serie:', error);
+      res.status(500).json({ error: 'Error al remover el producto de la serie' });
+  }
+});
