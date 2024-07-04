@@ -317,7 +317,7 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
   }); 
 app.post("/admin/productos", async function(req, res) {
   try {
-      const { nombre, detalle, precio, fechaRegistro, stock, estado, tipo, imagen, serie, marca } = req.body;
+      const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen} = req.body;
       const nuevoProducto = await Producto.create({
           nombre,
           detalle,
@@ -325,10 +325,7 @@ app.post("/admin/productos", async function(req, res) {
           fechaRegistro: fechaRegistro || new Date(), // Asigna la fecha actual si no se proporciona
           stock,
           estado,
-          tipo,
           imagen,
-          serie,
-          marca
       });
       res.status(201).json(nuevoProducto);
   } catch (error) {
@@ -378,7 +375,7 @@ app.post("/admin/series", async function(req, res) {
       const { nombre, descripcion, productos } = req.body;
       const nuevaSerie = await Serie.create({ nombre, descripcion });
       if (productos && productos.length > 0) {
-          await nuevaSerie.setProductos(productos);
+          await nuevaSerie.addProductos(productos);
       }
       res.status(201).json(nuevaSerie);
   } catch (error) {
@@ -418,7 +415,6 @@ app.put("/admin/series/:id", async function(req, res) {
   }
 });
 
-
 app.delete("/admin/series/:id", async function(req, res) {
   const idSerie = req.params.id;
   try {
@@ -430,3 +426,22 @@ app.delete("/admin/series/:id", async function(req, res) {
   }
 });
 
+app.delete("/admin/series/:id/productos/:productoId", async function(req, res) {
+  const idSerie = req.params.id;
+  const productoId = req.params.productoId;
+  try {
+      const serie = await Serie.findByPk(idSerie);
+      if (!serie) {
+          return res.status(404).json({ error: 'Serie no encontrada' });
+      }
+      const producto = await Producto.findByPk(productoId);
+      if (!producto) {
+          return res.status(404).json({ error: 'Producto no encontrado' });
+      }
+      await serie.removeProducto(producto);
+      res.status(200).send("Producto removido de la serie");
+  } catch (error) {
+      console.error('Error al remover el producto de la serie:', error);
+      res.status(500).json({ error: 'Error al remover el producto de la serie' });
+  }
+});
