@@ -7,10 +7,9 @@ import { Orden } from "./models/Orden.js";
 import { Producto } from "./models/Producto.js";
 import { Orden_Producto } from "./models/Orden_Producto.js";
 import { Serie } from "./models/Serie.js";
-import { or } from "sequelize";
 
 const app = express();
-const port = 3080;
+const port = process.env.PORT || 3080;
 
 app.use(cors());
 app.use(express.json());
@@ -34,9 +33,6 @@ app.listen(port, function() {
   verificarConexion();
 });
 /////////////USUARIOS////////////////
-app.get("/", function(req, res){
-    res.send("Hola mundo");
-});
 app.get("/admin/usuarios/:id", async function(req, res) {
     const idUser = req.params.id;
     try {
@@ -317,7 +313,7 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
   }); 
 app.post("/admin/productos", async function(req, res) {
   try {
-      const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen} = req.body;
+      const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen, } = req.body;
       const nuevoProducto = await Producto.create({
           nombre,
           detalle,

@@ -40,13 +40,13 @@ export default function Usuarios() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [usuariosData, setUsuariosData] = useState([]);
   const navigate = useNavigate();
-  const URL = 'http://localhost:3080/';
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
   const [contador, setContador] = useState(1);
 
   useEffect(() => {
     const Usuarios = async () => {
       try {
-        const response = await fetch(URL+'admin/usuarios', {
+        const response = await fetch(URL+'/admin/usuarios', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ export default function Usuarios() {
     setContador(contador + 1);
     try {
       const nuevoEstado = contador % 2 !== 0 ? "Inactivo" : "Activo";
-      const response = await fetch(URL + 'admin/usuarios/' + user.id, {
+      const response = await fetch(URL + '/admin/usuarios/' + user.id, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

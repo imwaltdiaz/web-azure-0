@@ -31,7 +31,7 @@ export default function DetalleOrden(){
         navigate('/admin/ordenes');
         async function deleteOrden() {
             try {
-                const response = await fetch('http://localhost:3080/admin/ordenes/' + id, {
+                const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/admin/ordenes/' + id, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export default function DetalleOrden(){
     }
     async function ActualizarTotal(){
         try {
-            const response = await fetch('http://localhost:3080/admin/ordenes/' + id, {
+            const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/admin/ordenes/' + id, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
