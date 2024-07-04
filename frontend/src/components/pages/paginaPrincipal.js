@@ -38,9 +38,9 @@ function Principal(){
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
-                
                 >
-                    {objetos.filter(objetos => objetos.tipo === "coleccion").map(objetos => (
+                    {/*
+                        {objetos.filter(objetos => objetos.tipo === "coleccion").map(objetos => (
                         <SCollection
                             id={objetos.id}
                             txtL1={objetos.nombre}
@@ -50,6 +50,8 @@ function Principal(){
                             height='50vh'
                         />
                     ))}
+                    */}
+                    
                 </Stack>
             </Box>
 
@@ -66,7 +68,7 @@ function Principal(){
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    {objetos.filter(objetos => objetos.tipo === "comun" && objetos.id>3 && objetos.id<9).map(objetos => (
+                    {objetos.filter(objetos => objetos.id>3 && objetos.id<9).map(objetos => (
                         <SCollection
                         txtL1={objetos.nombre}
                         hiperv="Learn More"
@@ -90,7 +92,7 @@ function Principal(){
                  justifyContent="space-between"
                  alignItems="center"
              >
-                 {objetos.filter(objetos => objetos.tipo === "comun" && objetos.id>8 && objetos.id<14).map(objetos => (
+                 {objetos.filter(objetos => objetos.id>8 && objetos.id<14).map(objetos => (
                     <SCollection
                         txtL1={objetos.nombre}
                         hiperv="Learn More"
@@ -125,7 +127,7 @@ function Principal(){
                     direction="row"
                     justifyContent="space-between"
                 >
-                    {objetos.filter(objetos => objetos.tipo === "nuevo" && objetos.id === 14).map(objetos => (
+                    {objetos.filter(objetos => objetos.id === 14).map(objetos => (
                         <SCollection
                             txtL1={objetos.nombre}
                             hiperv="Learn More"
@@ -140,7 +142,7 @@ function Principal(){
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    {objetos.filter(objetos => objetos.tipo === "nuevo" && objetos.id>14 && objetos.id<17).map(objetos => (
+                    {objetos.filter(objetos => objetos.id>14 && objetos.id<17).map(objetos => (
                         <SCollection
                             txtL1={objetos.nombre}
                             hiperv="Learn More"
@@ -165,7 +167,7 @@ function Principal(){
                  justifyContent="space-between"
                  alignItems="center"
                 >
-                 {objetos.filter(objetos => objetos.tipo === "nuevo" && objetos.id>16).map(objetos => (
+                 {objetos.filter(objetos => objetos.id>16).map(objetos => (
                     <SCollection
                         txtL1={objetos.nombre}
                         hiperv="Learn More"

@@ -31,24 +31,10 @@ export const Producto = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         },
-        
-        tipo: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         imagen: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        serie: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        marca: {
-            type: DataTypes.STRING,
-            allowNull: false
-        }
-
     }, {
         freezeTableName: true
     });
