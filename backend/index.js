@@ -88,10 +88,10 @@ app.get("/admin/usuarios", async function(req, res) {
       res.status(500).json({ error: 'Error al obtener los usuarios' });
     }
   });
-app.post("/admin/usuario", async function(req, res){
+  app.post("/admin/usuario", async function(req, res){
     try {    
         const data = req.body;
-        const estadodefault = "Activo"
+        const estadodefault = "Activo";
         if(data.nombre && data.apellido && data.correo && data.contrasena){
             const usuarioCreado = await Usuario.create({
                 nombre: data.nombre,
@@ -101,12 +101,13 @@ app.post("/admin/usuario", async function(req, res){
                 estado: estadodefault
             });
             res.status(201).json(usuarioCreado);
-            console.log("Usuario creado")
+            console.log("Usuario creado");
         }else{
             res.status(400).json("Faltan datos");
         }
     }catch(error){
-        res.status(400).json("Error en la BD");
+        console.error('Error al crear el usuario:', error.message);
+        res.status(500).json({ error: 'Error en la BD', details: error.message });
     }
 });
 app.put("/admin/usuarios/:id", async function(req, res){
