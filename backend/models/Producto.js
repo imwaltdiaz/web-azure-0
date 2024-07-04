@@ -31,6 +31,8 @@ export const Producto = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         },
+
+        /*
         tipo: {
             type: DataTypes.STRING,
             allowNull: false
@@ -46,7 +48,7 @@ export const Producto = sequelize.define(
         marca: {
             type: DataTypes.STRING,
             allowNull: false
-        }
+        }*/
 
     }, {
         freezeTableName: true
