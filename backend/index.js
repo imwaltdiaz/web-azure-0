@@ -33,6 +33,9 @@ app.listen(port, function() {
   verificarConexion();
 });
 /////////////USUARIOS////////////////
+app.get("/", function(req, res) {
+    return res.send("API de la tienda del abuelo");
+});
 app.get("/admin/usuarios/:id", async function(req, res) {
     const idUser = req.params.id;
     try {
