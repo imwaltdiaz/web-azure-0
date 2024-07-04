@@ -12,8 +12,22 @@ export default function Productos() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('productos')) || [];
-    setData(storedData);
+    // Reemplaza esta URL con la URL de tu backend
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:3080/admin/productos');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        console.log('Datos obtenidos del backend:', result); // Verifica los datos obtenidos
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleChangePage = (event, newPage) => {
@@ -32,7 +46,7 @@ export default function Productos() {
   const filteredData = data.filter((product) =>
     product.id.toString().includes(searchTerm) ||
     product.detalle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.serie.toLowerCase().includes(searchTerm.toLowerCase())
+    (product.serie && product.serie.toString().toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleAddProduct = () => {
@@ -44,10 +58,7 @@ export default function Productos() {
   };
 
   return (
-    <Paper style={{ minHeight: '400px', 
-      minWidth: '70vw'
-
-    }}>
+    <Paper style={{ minHeight: '400px', minWidth: '70vw' }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" padding={2}>
         <h2>Productos</h2>
         <Button variant="contained" color="primary" onClick={handleAddProduct}>
