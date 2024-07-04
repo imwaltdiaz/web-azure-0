@@ -7,10 +7,9 @@ import { Orden } from "./models/Orden.js";
 import { Producto } from "./models/Producto.js";
 import { Orden_Producto } from "./models/Orden_Producto.js";
 import { Serie } from "./models/Serie.js";
-import { or } from "sequelize";
 
 const app = express();
-const port = 3080;
+const port = process.env.PORT || 3080;
 
 app.use(cors());
 app.use(express.json());
@@ -34,9 +33,6 @@ app.listen(port, function() {
   verificarConexion();
 });
 /////////////USUARIOS////////////////
-app.get("/", function(req, res){
-    res.send("Hola mundo");
-});
 app.get("/admin/usuarios/:id", async function(req, res) {
     const idUser = req.params.id;
     try {
