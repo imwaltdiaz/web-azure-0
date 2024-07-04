@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from "@mui/material/Typography";
 import ListaItemCarr from "../user/ItemBusqueda";
 import Select from '@mui/material/Select';
@@ -8,14 +8,34 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import Header2 from '../user/headerU';
 import Footer from '../common/footer';
+import { useLocation } from "react-router-dom";
 function Busqueda(){
+    const location = useLocation();
     
+    const searchQuery = location.state.searchQuery;
+
     const [selectedValue, setSelectedValue] = useState(1);
 
     const handleChange = (event) => {
         setSelectedValue(event.target.value);
     };
 
+    const [productos,setProductos] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch("http://localhost:3080/admin/productos",{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const data = await response.json();
+            setProductos(data);
+            console.log(searchQuery);
+        };
+        fetchData();
+      }, []);
+      
     return(
         <>
             <Header2/>
@@ -58,37 +78,22 @@ function Busqueda(){
                     Resultados de busqueda
                 </Typography>
             </Box>
-            
+
             <Box
                 sx={{
                     mx : 5,
                     mt : 2
                 }}
             >
-                <ListaItemCarr
-                imagen = "https://blog.bangbranding.com/wp-content/uploads/2016/11/700x511_SliderInterior.jpg"
-                nombre = "Voltron Mini Action Voltron Vehicle Force Figure (Standart)"
-                fabricante= "Bandai"
-                precio = "65.99"
-                />
-                <ListaItemCarr
-                imagen = "https://blog.bangbranding.com/wp-content/uploads/2016/11/700x511_SliderInterior.jpg"
-                nombre = "Saint Seiya HQS Plus Anthena Limited Edition Statue"
-                fabricante= "Bandai - Serie: Saint Seiya HQS"
-                precio = "185.89"
-                />
-                <ListaItemCarr
-                imagen = "https://blog.bangbranding.com/wp-content/uploads/2016/11/700x511_SliderInterior.jpg"
-                nombre = "Saint Seiya Premium Masterline Dragon Shiryu Final Bronze Cloth 1/4 Scale Statue"
-                fabricante= "Prime 1 Studio - Serie: Knights of The Zodiac"
-                precio = "4599.69"
-                />
-                <ListaItemCarr
-                imagen = "https://blog.bangbranding.com/wp-content/uploads/2016/11/700x511_SliderInterior.jpg"
-                nombre = "Voltron Mini Action Voltron Vehicle Force Figure (Standart)"
-                fabricante= "Bandai"
-                precio = "2500.36"
-                />
+                {productos.filter(productos => productos.nombre === searchQuery || productos.serie === searchQuery || productos.marca === searchQuery || productos.tipo === searchQuery).map(productos => (
+                    <ListaItemCarr
+                        imagen = {productos.imagen}
+                        nombre = {productos.nombre}
+                        serie = {productos.serie}
+                        fabricante= {productos.marca}
+                        precio = {productos.precio}
+                    />
+                ))};
             </Box>
             <Box
                 sx={{

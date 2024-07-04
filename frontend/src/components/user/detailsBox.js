@@ -1,8 +1,9 @@
 import { Box, Button, Stack, Link } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation} from 'react-router-dom';
 
-function DetailsBox(){
+function DetailsBox(img){
     const [count, setCount] = useState(0);
 
     const handleDecrement = () => {
@@ -12,6 +13,26 @@ function DetailsBox(){
     const handleIncrement = () => {
         setCount(prevCount => prevCount + 1);
     };
+
+    const location = useLocation();
+    const id = location.state.id;
+    const [producto,setProducto] = useState([]);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch("http://localhost:3080/admin/productos/"+ id,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const data = await response.json();
+            setProducto(data);
+            console.log(id);
+            
+        };
+        fetchData();
+      }, [id]);
     
     
     return(
@@ -33,7 +54,7 @@ function DetailsBox(){
                     border: '2px solid gray',
                     ml: 8,
                     borderRadius: 2,
-                    backgroundImage: 'url(https://images.ctfassets.net/s5n2t79q9icq/6QPwg3EEdBnhHeIGwonKTf/364e43fdd14542e3c2d4f485317823ef/uxyci7dshzjknw_Collector_EN.png)',
+                    backgroundImage: 'url(${img})',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
@@ -73,7 +94,7 @@ function DetailsBox(){
                     direction="column" spacing={8}
                     alignItems={'center'}
                 >
-                    <Typography variant="h3" fontWeight="bold" sx={{pt : '50px'}}>S/88.99</Typography>
+                    <Typography variant="h3" fontWeight="bold" sx={{pt : '50px'}}>S/{producto.precio}</Typography>
                     <Button variant="contained" sx={{width : '200px', height : '150px', fontSize : '20px', bl:'50px'
 
                       

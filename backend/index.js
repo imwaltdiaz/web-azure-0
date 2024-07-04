@@ -34,6 +34,9 @@ app.listen(port, function() {
   verificarConexion();
 });
 /////////////USUARIOS////////////////
+app.get("/", function(req, res){
+    res.send("Hola mundo");
+});
 app.get("/admin/usuarios/:id", async function(req, res) {
     const idUser = req.params.id;
     try {
@@ -49,7 +52,7 @@ app.get("/admin/usuarios/:id", async function(req, res) {
                 include: [
                   {
                     model: Producto,
-                    attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"]
+                    attributes: ["id","detalle", "precio", "fechaRegistro", "stock", "estado"]
                   }
                 ]
               }
@@ -75,7 +78,7 @@ app.get("/admin/usuarios", async function(req, res) {
                   include: [
                     {
                       model: Producto,
-                      attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"]
+                      attributes: ["id","detalle", "precio", "fechaRegistro", "stock", "estado"]
                     }
                   ],order: [['id', 'ASC']]
                 }
@@ -160,7 +163,7 @@ app.get("/admin/ordenes", async function(req, res) {
             include: [
               {
                 model: Producto,
-                attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"]
+                attributes: ["id","detalle", "precio", "fechaRegistro", "stock", "estado"]
               }
             ],order: [['id', 'ASC']]
           }
@@ -244,7 +247,7 @@ app.put("/admin/ordenes/:id", async function(req, res) {
           include: [
               {
                   model: Producto,
-                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+                  attributes: ["id","detalle", "precio", "fechaRegistro", "stock", "estado"],
               }
           ]
       });
@@ -296,7 +299,7 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
           {
             model: Producto,
             through: { attributes: [] }, // Esto asume que hay una tabla intermedia
-            attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+            attributes: ["id","detalle", "precio", "fechaRegistro", "stock", "estado"],
             order: [['id', 'ASC']]
           }
         ], order: [['id', 'ASC']]
@@ -314,13 +317,18 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
   }); 
 app.post("/admin/productos", async function(req, res) {
   try {
-      const { detalle, precio, fechaRegistro, stock, estado } = req.body;
+      const { nombre, detalle, precio, fechaRegistro, stock, estado, tipo, imagen, serie, marca } = req.body;
       const nuevoProducto = await Producto.create({
+          nombre,
           detalle,
           precio,
           fechaRegistro: fechaRegistro || new Date(), // Asigna la fecha actual si no se proporciona
           stock,
-          estado
+          estado,
+          tipo,
+          imagen,
+          serie,
+          marca
       });
       res.status(201).json(nuevoProducto);
   } catch (error) {
@@ -335,7 +343,7 @@ app.get("/admin/series", async function(req, res) {
           include: [
               {
                   model: Producto,
-                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
               }
           ]
       });
@@ -354,7 +362,7 @@ app.get("/admin/series/:id", async function(req, res) {
           include: [
               {
                   model: Producto,
-                  attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
               }
           ]
       });
@@ -398,7 +406,7 @@ app.put("/admin/series/:id", async function(req, res) {
       include: [
         {
           model: Producto,
-          attributes: ["id", "detalle", "precio", "fechaRegistro", "stock", "estado"],
+          attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
         }
       ]
     });
@@ -421,6 +429,4 @@ app.delete("/admin/series/:id", async function(req, res) {
       res.status(500).json({ error: 'Error al eliminar la serie' });
   }
 });
-
-
 
