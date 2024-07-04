@@ -317,7 +317,7 @@ app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function(req, r
   }); 
 app.post("/admin/productos", async function(req, res) {
   try {
-      const { nombre, detalle, precio, fechaRegistro, stock, estado, tipo, imagen, serie, marca } = req.body;
+      const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen, } = req.body;
       const nuevoProducto = await Producto.create({
           nombre,
           detalle,
@@ -325,10 +325,7 @@ app.post("/admin/productos", async function(req, res) {
           fechaRegistro: fechaRegistro || new Date(), // Asigna la fecha actual si no se proporciona
           stock,
           estado,
-          tipo,
           imagen,
-          serie,
-          marca
       });
       res.status(201).json(nuevoProducto);
   } catch (error) {
