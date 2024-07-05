@@ -11,22 +11,17 @@ export default function Productos() {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Reemplaza esta URL con la URL de tu backend
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:3080/admin/productos');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const result = await response.json();
-        console.log('Datos obtenidos del backend:', result); // Verifica los datos obtenidos
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:3080/admin/productos');
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -43,8 +38,26 @@ export default function Productos() {
     setSearchTerm(event.target.value);
   };
 
+  const handleDeleteProduct = async (productId) => {
+    try {
+      const response = await fetch(`http://localhost:3080/admin/productos/${productId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Actualizar la lista de productos después de eliminar uno
+      setData(data.filter(product => product.id !== productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
   const filteredData = data.filter((product) =>
     product.id.toString().includes(searchTerm) ||
+    product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.detalle.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (product.serie && product.serie.toString().toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -66,7 +79,7 @@ export default function Productos() {
         </Button>
       </Stack>
       <TextField
-        label="Buscar por ID, serie o detalle"
+        label="Buscar por ID, nombre, serie o detalle"
         variant="outlined"
         fullWidth
         margin="normal"
@@ -77,6 +90,7 @@ export default function Productos() {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
+              <TableCell>Nombre</TableCell>
               <TableCell>Detalle</TableCell>
               <TableCell>Serie</TableCell>
               <TableCell>Precio</TableCell>
@@ -90,6 +104,7 @@ export default function Productos() {
             {filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
               <TableRow key={product.id}>
                 <TableCell>{product.id}</TableCell>
+                <TableCell>{product.nombre}</TableCell>
                 <TableCell>{product.detalle}</TableCell>
                 <TableCell>{product.serie}</TableCell>
                 <TableCell>{product.precio}</TableCell>
@@ -98,7 +113,7 @@ export default function Productos() {
                 <TableCell>{product.estado}</TableCell>
                 <TableCell>
                   <Button color="primary" onClick={() => handleViewProduct(product)}>Ver</Button>
-                  <Button color="secondary">Desactivar</Button>
+                  <Button color="secondary" onClick={() => handleDeleteProduct(product.id)}>Desactivar</Button>
                 </TableCell>
               </TableRow>
             ))}

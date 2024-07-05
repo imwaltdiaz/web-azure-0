@@ -1,11 +1,10 @@
-// CabeceraAdmin.js
 import React from 'react';
 import Stack from '@mui/material/Stack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-export function CabeceraAdmin() {
+export function CabeceraAdmin({ onDateChange }) {
   return (
     <Stack
       direction="row"
@@ -15,7 +14,10 @@ export function CabeceraAdmin() {
     >
       <h2>Dashboard</h2>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker label="Cambiar fecha o periodo" />
+        <DatePicker 
+          label="Cambiar fecha o periodo" 
+          onChange={onDateChange} 
+        />
       </LocalizationProvider>
     </Stack>
   );

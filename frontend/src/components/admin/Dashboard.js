@@ -1,33 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { CabeceraAdmin } from "../common/CabeceraAdmin";
 import Container from "@mui/material/Container";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
 
 export default function Dashboard() {
   const [numUsuarios, setNumUsuarios] = useState(0);
+  const [numOrdenes, setNumOrdenes] = useState(0);
+  const [ingresoTotal, setIngresoTotal] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3080/admin/usuarios'); // Reemplaza con la URL correcta de tu API
+        const response = await fetch('http://localhost:3000/admin/usuarios'); // Reemplaza con la URL correcta de tu API
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const usuarios = await response.json();
-        setNumUsuarios(usuarios.length); // Actualiza el estado con el número de usuarios
+        const usuariosHoy = usuarios.filter(usuario => dayjs(usuario.fechaRegistro).isSame(selectedDate, 'day'));
+        setNumUsuarios(usuariosHoy.length); // Actualiza el estado con el número de usuarios de hoy
       } catch (error) {
         console.error('Error fetching usuarios:', error);
       }
     };
 
+    const fetchOrdenes = async () => {
+      try {
+        const response = await fetch('http://localhost:3080/admin/ordenes'); // Reemplaza con la URL correcta de tu API
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const ordenes = await response.json();
+        const ordenesHoy = ordenes.filter(orden => dayjs(orden.fechaOrden).isSame(selectedDate, 'day'));
+        setNumOrdenes(ordenesHoy.length); // Actualiza el estado con el número de órdenes de hoy
+
+        const totalIngresos = ordenesHoy.reduce((total, orden) => total + orden.cuentaTotal, 0);
+        setIngresoTotal(totalIngresos); // Actualiza el estado con el ingreso total de hoy
+      } catch (error) {
+        console.error('Error fetching ordenes:', error);
+      }
+    };
+
     fetchUsuarios();
-  }, []);
+    fetchOrdenes();
+  }, [selectedDate]);
 
   const card0 = (
     <React.Fragment>
@@ -43,10 +67,10 @@ export default function Dashboard() {
         }}
       >
         <Typography variant="h2" component="div">
-          68
+          {numOrdenes}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          Órdenes el dia de hoy
+          Órdenes el día de hoy
         </Typography>
       </CardContent>
     </React.Fragment>
@@ -89,7 +113,7 @@ export default function Dashboard() {
         }}
       >
         <Typography variant="h3" component="div">
-          S/13.5k
+          S/{ingresoTotal}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
           Ingresos de hoy
@@ -102,7 +126,7 @@ export default function Dashboard() {
     <>
       <Container>
         <Stack direction="column">
-          <CabeceraAdmin></CabeceraAdmin>
+          <CabeceraAdmin onDateChange={handleDateChange} />
           <Stack direction="row" justifyContent="space-between" pt="20px">
             <Card variant="outlined">{card0}</Card>
             <Card variant="outlined">{card1}</Card>

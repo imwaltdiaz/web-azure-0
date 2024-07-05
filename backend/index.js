@@ -150,6 +150,7 @@ app.get("/admin/ordenes/:id", async function(req, res){
         res.status(400).json("Error en la BD");
     }
 });
+//prueba
 app.get("/admin/ordenes", async function(req, res) {
     try {
       const ordenes = await Orden.findAll({
@@ -427,3 +428,44 @@ app.delete("/admin/series/:id", async function(req, res) {
   }
 });
 
+app.delete("/admin/productos/:id", async function(req, res){
+  const idProducto = req.params.id;
+  try {
+    await Producto.destroy({ where: { id: idProducto } });
+    res.send("Producto eliminado");
+  } catch (error) {
+    res.status(400).send("Error en la BD");
+  }
+});
+app.put("/admin/productos/:id", async function(req, res) {
+  const idProducto = req.params.id;
+  try {
+    const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen } = req.body;
+    
+    // Validar que precio y stock sean números
+    const precioParsed = parseInt(precio, 10);
+    const stockParsed = parseInt(stock, 10);
+
+    if (isNaN(precioParsed) || isNaN(stockParsed)) {
+      return res.status(400).send("Precio y Stock deben ser números válidos");
+    }
+
+    const producto = await Producto.findOne({ where: { id: idProducto } });
+    if (producto) {
+      await producto.update({
+        nombre,
+        detalle,
+        precio: precioParsed,
+        fechaRegistro,
+        stock: stockParsed,
+        estado,
+        imagen
+      });
+      res.status(200).json(producto);
+    } else {
+      res.status(404).send("Producto no encontrado");
+    }
+  } catch (error) {
+    res.status(400).send("Error en la BD");
+  }
+});

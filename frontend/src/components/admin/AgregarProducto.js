@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Stack,
-} from "@mui/material";
+import { Box, Button, TextField, Typography, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import { useNavigate, useLocation } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid'; // Para generar IDs únicos
 
 function generateShortId() {
   return Math.floor(Math.random() * 90000) + 10000; // Generar un número entre 10000 y 99999
@@ -26,15 +19,17 @@ export default function AgregarProducto() {
 
   const [product, setProduct] = useState({
     id: generateShortId(), // Generar un ID único para cada producto
+    nombre: '',
     detalle: '',
     descripcion: '',
     caracteristicas: '',
     marca: '',
     serie: '',
-    precio: '',
-    fechaRegistro: new Date().toLocaleDateString(),
-    stock: 0,
-    estado: 'Activo'
+    precio: '', // Asegúrate de que sea un número antes de enviarlo
+    fechaRegistro: new Date().toISOString().split('T')[0], // Formato ISO
+    stock: '', // Asegúrate de que sea un número antes de enviarlo
+    estado: 'Disponible',
+    imagen: '', // Campo para la imagen
   });
 
   const navigate = useNavigate();
@@ -53,19 +48,41 @@ export default function AgregarProducto() {
     });
   };
 
-  const handleSave = () => {
-    const existingProducts = JSON.parse(localStorage.getItem('productos')) || [];
-    if (existingProducts.find(p => p.id === product.id)) {
-      // Editar producto existente
-      const updatedProducts = existingProducts.map(p => p.id === product.id ? product : p);
-      localStorage.setItem('productos', JSON.stringify(updatedProducts));
-    } else {
-      // Añadir nuevo producto
-      localStorage.setItem('productos', JSON.stringify([...existingProducts, product]));
-    }
+  const handleSave = async () => {
+    try {
+      const method = location.state && location.state.product ? 'PUT' : 'POST';
+      const url = location.state && location.state.product
+        ? `http://localhost:3080/admin/productos/${product.id}`
+        : 'http://localhost:3080/admin/productos';
 
-    // Redirigir a la tabla de productos
-    navigate('/admin/productos');
+      const data = {
+        ...product,
+        precio: parseInt(product.precio, 10),
+        stock: parseInt(product.stock, 10),
+      };
+
+      if (isNaN(data.precio) || isNaN(data.stock)) {
+        alert("Por favor, asegúrate de que los campos precio y stock sean números válidos.");
+        return;
+      }
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Redirigir a la tabla de productos después de guardar
+      navigate('/admin/productos');
+    } catch (error) {
+      console.error('Error saving product:', error);
+    }
   };
 
   return (
@@ -98,7 +115,7 @@ export default function AgregarProducto() {
                   height: 200,
                   border: "1px solid #ddd",
                   display: "flex",
-                  justifyContent:"center",
+                  justifyContent: "center",
                   alignItems: "center",
                   mb: 2,
                 }}
@@ -118,14 +135,14 @@ export default function AgregarProducto() {
             <Stack direction="column " alignItems="left" width="100%" ml="40px">
               <label>Nombre</label>
               <TextField
-                name="detalle"
+                name="nombre"
                 label="Nombre"
                 fullWidth
                 margin="normal"
                 size="small"
                 sx={{ marginTop: "10px" }}
                 onChange={handleChange}
-                value={product.detalle}
+                value={product.nombre}
               />
               <label>Descripción</label>
               <TextField
