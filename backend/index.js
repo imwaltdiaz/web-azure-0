@@ -189,44 +189,44 @@ app.get("/admin/usuarios/:id/ordenes", async function(req, res){
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
-app.post("/admin/usuarios/:id/orden", async function(req, res) {
+  app.post("/admin/usuarios/:id/orden", async function(req, res) {
     try {
-        const data = req.body;
-        const idUser = req.params.id;
-        const cuenta = 0;
-        const estadodefault = "En Proceso";
-
-        const usuario = await Usuario.findByPk(idUser);
-        if (!usuario) {
-            console.log('Usuario no encontrado');
-            res.status(404).json({ error: 'Usuario no encontrado' });
-        }
-        if (data.direccion && data.metPago && data.nroTarjeta && data.envio) {
-            const ordenCreada = await Orden.create({
-                cuentaTotal: cuenta,
-                estado: estadodefault,
-                direccion: data.direccion,
-                metPago: data.metPago,
-                nroTarjeta: data.nroTarjeta,
-                envio: data.envio,
-                usuarioId: idUser
-            });
-            await usuario.addOrden(ordenCreada);
-            const result = await Orden.findOne({ 
-                where: { id: ordenCreada.id },
-                include: [{ model: Usuario, attributes: ["nombre", "apellido", "correo"]}]
-            });
-            res.status(201).json(result);
-            console.log('Orden creada y asociada al usuario');
-        } else {
-            console.log('Faltan datos en req.body:', data);
-            res.status(400).json("Faltan datos");
-        }
+      const data = req.body;
+      const idUser = req.params.id;
+      const cuenta = 0;
+      const estadodefault = "En Proceso";
+  
+      const usuario = await Usuario.findByPk(idUser);
+      if (!usuario) {
+        console.log('Usuario no encontrado');
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+      if (data.direccion && data.metPago && data.nroTarjeta && data.envio) {
+        const ordenCreada = await Orden.create({
+          cuentaTotal: cuenta,
+          estado: estadodefault,
+          direccion: data.direccion,
+          metPago: data.metPago,
+          nroTarjeta: data.nroTarjeta,
+          envio: data.envio,
+          usuarioId: idUser
+        });
+        await usuario.addOrden(ordenCreada);
+        const result = await Orden.findOne({ 
+          where: { id: ordenCreada.id },
+          include: [{ model: Usuario, attributes: ["nombre", "apellido", "correo"]}]
+        });
+        return res.status(201).json(result);
+      } else {
+        console.log('Faltan datos en req.body:', data);
+        return res.status(400).json("Faltan datos");
+      }
     } catch (error) {
-        console.error('Error al crear la orden y asociarla al usuario:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+      console.error('Error al crear la orden y asociarla al usuario:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-});
+  });
+  
 app.put("/admin/ordenes/:id", async function(req, res) {
   const idOrden = req.params.id;
   const { productos, ...data } = req.body;
@@ -370,6 +370,7 @@ app.get("/admin/series/:id", async function(req, res) {
       res.status(500).json({ error: 'Error al obtener la serie' });
   }
 });
+//dev
 
 app.post("/admin/series", async function(req, res) {
   try {
@@ -427,6 +428,9 @@ app.delete("/admin/series/:id", async function(req, res) {
       res.status(500).json({ error: 'Error al eliminar la serie' });
   }
 });
+
+
+
 
 app.delete("/admin/productos/:id", async function(req, res){
   const idProducto = req.params.id;

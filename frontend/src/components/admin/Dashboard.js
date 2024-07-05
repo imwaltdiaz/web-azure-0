@@ -20,7 +20,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3000/admin/usuarios'); // Reemplaza con la URL correcta de tu API
+        const response = await fetch('http://localhost:3080/admin/usuarios'); // Reemplaza con la URL correcta de tu API
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
