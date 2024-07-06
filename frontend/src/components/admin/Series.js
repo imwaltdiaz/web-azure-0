@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Stack, TextField, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableFooter, TablePagination, Button, Typography } from '@mui/material';
-import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
+import { KeyboardArrowLeft, KeyboardArrowRight, Add } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 function TablePaginationActions(props) {
@@ -41,6 +41,8 @@ export default function Series() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [seriesData, setSeriesData] = useState([]);
   const navigate = useNavigate();
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
+  const url2 = 'http://localhost:3080';
 
   useEffect(() => {
     fetchSeries();
@@ -58,7 +60,7 @@ export default function Series() {
 
   const fetchSeries = async () => {
     try {
-      const response = await fetch('http://localhost:3080/admin/series');
+      const response = await fetch(url2+'/admin/series');
       const data = await response.json();
       setSeriesData(data);
     } catch (error) {
@@ -79,6 +81,10 @@ export default function Series() {
     navigate(`/admin/agregarserie/${serie.id}`, { state: { serie } });
   };
 
+  const handleAddNewSerie = () => {
+    navigate(`/admin/agregarserie`);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '76vh', mb: 4, marginBottom: "40px" }}>
       <Stack direction="column" justifyContent="flex-start" paddingLeft="1vw" sx={{ flexGrow: 1 }}>
@@ -97,6 +103,9 @@ export default function Series() {
             width: '77vw',
           }}
         />
+        <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleAddNewSerie}>
+          Añadir Nueva Serie
+        </Button>
         <TableContainer component={Paper} sx={{ flexGrow: 1 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>

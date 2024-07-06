@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ProductDialog from './ProductDialog';
 
 export default function AgregarSerie() {
   const location = useLocation();
@@ -11,13 +12,13 @@ export default function AgregarSerie() {
   const [descripcion, setDescripcion] = useState(serie?.descripcion || '');
   const [productos, setProductos] = useState(serie?.productos || []);
   const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [availableProducts, setAvailableProducts] = useState([]);
 
   useEffect(() => {
     if (serie && serie.id) {
       fetchSeriesProducts(serie.id);
     }
+    fetchAllProducts();
   }, [serie]);
 
   const fetchSeriesProducts = async (serieId) => {
@@ -29,6 +30,16 @@ export default function AgregarSerie() {
       setProductos(data.Productos || []);
     } catch (error) {
       console.error('Error al obtener la serie:', error);
+    }
+  };
+
+  const fetchAllProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:3080/admin/productos');
+      const data = await response.json();
+      setAvailableProducts(data);
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
     }
   };
 
@@ -77,19 +88,6 @@ export default function AgregarSerie() {
       navigate('/admin/series');
     } catch (error) {
       console.error('Error al guardar la serie:', error);
-    }
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await fetch('http://localhost:3080/admin/productos');
-      const data = await response.json();
-      setAvailableProducts(data.filter(product =>
-        product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.id.toString().includes(searchTerm)
-      ));
-    } catch (error) {
-      console.error('Error al buscar productos:', error);
     }
   };
 
@@ -172,51 +170,13 @@ export default function AgregarSerie() {
         <Button variant="contained" color="primary" onClick={handleGuardarClick}>Guardar</Button>
       </Box>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Agregar Producto</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-            <TextField
-              fullWidth
-              placeholder="Buscar por descripción o ID"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Button variant="contained" color="primary" onClick={handleSearch}>Buscar</Button>
-          </Box>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Acción</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {availableProducts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3} align="center">No se encontraron productos</TableCell>
-                  </TableRow>
-                ) : (
-                  availableProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>{product.id}</TableCell>
-                      <TableCell>{product.descripcion}</TableCell>
-                      <TableCell>
-                        <Button color="primary" onClick={() => handleAddToSerie(product)}>Agregar</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="secondary">Cerrar</Button>
-        </DialogActions>
-      </Dialog>
+      <ProductDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onAddProduct={handleAddToSerie}
+        availableProducts={availableProducts}
+        serie={serie}
+      />
     </Box>
   );
 }

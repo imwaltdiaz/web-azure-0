@@ -38,6 +38,7 @@ export default function AdminMain() {
           <Route path="productos" element={<Productos data={data} />} />
           <Route path="series" element={<Series />} />
           <Route path="agregarproducto" element={<AgregarProducto />} />
+          <Route path="agregarserie" element={<AgregarSerie />} />
           <Route path="agregarserie/:id" element={<AgregarSerie />} />
           <Route path="usuario/:id" element={<DetalleUsuario />} />
           <Route path="orden/:id" element={<DetalleOrden />} />
