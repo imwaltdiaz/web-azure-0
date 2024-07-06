@@ -15,6 +15,8 @@ export default function DetalleOrden(){
     const SubTotal = producto.reduce((acc, prod) => acc + prod.Producto.precio * prod.Producto.stock, 0);
     const Impuestos = 18;
     const Total = SubTotal + (envio === "Economico" ? 10 : 17) + Impuestos;
+    const url1 = 'https://tienditadelabuelo.postgres.database.azure.com';
+    const url2 = 'http://localhost:3080';
 
     function OfuscarNumero(number) {
         const numStr = number.toString();
@@ -31,7 +33,7 @@ export default function DetalleOrden(){
         navigate('/admin/ordenes');
         async function deleteOrden() {
             try {
-                const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/admin/ordenes/' + id, {
+                const response = await fetch(url2 + '/admin/ordenes/' + id, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -48,7 +50,7 @@ export default function DetalleOrden(){
     }
     async function ActualizarTotal(){
         try {
-            const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/admin/ordenes/' + id, {
+            const response = await fetch(url2 + '/admin/ordenes/' + id, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

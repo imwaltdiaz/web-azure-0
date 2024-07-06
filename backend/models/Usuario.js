@@ -25,7 +25,7 @@ export const Usuario = sequelize.define(
             defaultValue: DataTypes.NOW
         },
         estado: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
             defaultValue: 'Activo'
         }
