@@ -40,13 +40,13 @@ export default function Ordenes() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [ordenesData, setOrdenesData] = useState([]);
   const navigate = useNavigate();
-  const URL = 'http://localhost:3080/';
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
 
 
   useEffect(() => {
     const Ordenes = async () => {
       try {
-        const response = await fetch(URL+'admin/ordenes', {
+        const response = await fetch(URL+'/admin/ordenes', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'

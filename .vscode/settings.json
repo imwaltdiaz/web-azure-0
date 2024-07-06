@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/08c3ed87-d662-4af7-95de-6ab507a04db1/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/tiendaDelAbuelo",
+    "appService.deploySubpath": "backend"
+}
