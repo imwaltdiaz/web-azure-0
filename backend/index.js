@@ -140,6 +140,85 @@ app.delete("/admin/usuarios/:id", async function(req, res){
             res.status(400).send("Error en la BD");
       }      
 });
+
+app.post('/login', async (req, res) => {
+  const { correo } = req.body;
+
+  try {
+    if (!correo) {
+      return res.status(400).json({ message: 'Correo no proporcionado' });
+    }
+
+    console.log('Correo recibido:', correo);
+
+    const usuario = await Usuario.findOne({ where: { correo } });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json(usuario);
+  } catch (error) {
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+});
+
+app.get('/usuarios/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const usuario = await Usuario.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json(usuario);
+  } catch (error) {
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+});
+
+app.put('/usuarios/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { nombre, apellido, correo, contrasena } = req.body;
+
+  try {
+    const usuario = await Usuario.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    usuario.nombre = nombre;
+    usuario.apellido = apellido;
+    usuario.correo = correo;
+    usuario.contrasena = contrasena;
+    await usuario.save();
+
+    res.json(usuario);
+  } catch (error) {
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+});
+
+app.get('/usuarios/:userId/ordenes', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const usuario = await Usuario.findByPk(userId, {
+      include: [{ model: Orden, include: [Producto] }]
+    });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json(usuario.Ordens);
+  } catch (error) {
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+});
 /////////////ORDENES////////////////
 app.get("/admin/ordenes/:id", async function(req, res){
    const idOrden = req.params.id;

@@ -22,23 +22,43 @@ const LoginPage = () => {
     setMostrarOpciones(true);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const { correo, password } = formData;
 
-    if (correo !== 'nicole@gmail.com' || password !== '123456') {
-      setMensajeError('email o password incorrecto');
-      setMostrarOpciones(false);
-      return;
-    }
-    console.log('Datos enviados:', { correo, password });
+    try {
+      const response = await fetch('http://localhost:3080/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ correo })
+      });
 
-    setFormData({
-      correo: '',
-      password: ''
-    });
-    setMensajeError('');
-    navigate('/pantalla-principal'); // Redirige a la página principal después de un login exitoso
+      if (!response.ok) {
+        const errorData = await response.json();
+        setMensajeError(errorData.message || 'Error en la autenticación');
+        setMostrarOpciones(false);
+        return;
+      }
+
+      const data = await response.json();
+      if (password !== data.contrasena) {
+        setMensajeError('Correo o contraseña incorrectos');
+        setMostrarOpciones(false);
+        return;
+      }
+
+      setFormData({
+        correo: '',
+        password: ''
+      });
+      setMensajeError('');
+      navigate(`/pantalla-principal/${data.id}`); // Redirige a la página principal con el ID del usuario
+    } catch (error) {
+      setMensajeError('Error en el servidor');
+      setMostrarOpciones(false);
+    }
   };
 
   return (
