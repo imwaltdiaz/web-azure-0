@@ -1,5 +1,5 @@
-import express from "express"
-import cors from "cors"
+import express from "express";
+import cors from "cors";
 import bodyParser from "body-parser";
 import { sequelize } from "./database/database.js";
 import { Usuario } from "./models/Usuario.js";
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ 
     extended: true
 }));
+
 /////////////CONEXION////////////////
 async function verificarConexion() {
   try {
