@@ -14,15 +14,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3080;
 
-
 app.use(cors());
 app.use(express.json());
 
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+app.use(bodyParser.urlencoded({ extended: true }));
 
 /////////////CONEXION////////////////
 async function verificarConexion() {
@@ -34,14 +29,17 @@ async function verificarConexion() {
     console.error("No se puede conectar a la BD", error);
   }
 }
+
 app.listen(port, function () {
   console.log("Servidor escuchando en puerto " + port);
   verificarConexion();
 });
+
 /////////////USUARIOS////////////////
 app.get("/", function (req, res) {
   return res.send("API de la tienda del abuelo");
 });
+
 app.get("/admin/usuarios/:id", async function (req, res) {
   const idUser = req.params.id;
   try {
@@ -88,6 +86,7 @@ app.get("/admin/usuarios/:id", async function (req, res) {
     res.status(400).json({ error: "Error en la BD" });
   }
 });
+
 app.get("/admin/usuarios", async function (req, res) {
   try {
     const usuarios = await Usuario.findAll({
@@ -134,6 +133,7 @@ app.get("/admin/usuarios", async function (req, res) {
     res.status(500).json({ error: "Error al obtener los usuarios" });
   }
 });
+
 app.post("/admin/usuario", async function (req, res) {
   try {
     const data = req.body;
@@ -156,6 +156,7 @@ app.post("/admin/usuario", async function (req, res) {
     res.status(500).json({ error: "Error en la BD", details: error.message });
   }
 });
+
 app.put("/admin/usuarios/:id", async function (req, res) {
   const idUser = req.params.id;
   const data = req.body;
@@ -174,6 +175,7 @@ app.put("/admin/usuarios/:id", async function (req, res) {
     res.status(400).json("Error en la BD");
   }
 });
+
 app.delete("/admin/usuarios/:id", async function (req, res) {
   const idUser = req.params.id;
   try {
@@ -262,6 +264,7 @@ app.get("/usuarios/:userId/ordenes", async (req, res) => {
     res.status(500).json({ message: "Error en el servidor", error });
   }
 });
+
 /////////////ORDENES////////////////
 app.get("/admin/ordenes/:id", async function (req, res) {
   const idOrden = req.params.id;
@@ -272,7 +275,7 @@ app.get("/admin/ordenes/:id", async function (req, res) {
     res.status(400).json("Error en la BD");
   }
 });
-//prueba
+
 app.get("/admin/ordenes", async function (req, res) {
   try {
     const ordenes = await Orden.findAll({
@@ -306,6 +309,7 @@ app.get("/admin/ordenes", async function (req, res) {
     res.status(500).json({ error: error.message });
   }
 });
+
 app.get("/admin/usuarios/:id/ordenes", async function (req, res) {
   const idUser = req.params.id;
   try {
@@ -320,6 +324,7 @@ app.get("/admin/usuarios/:id/ordenes", async function (req, res) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
 app.post("/admin/usuarios/:id/orden", async function (req, res) {
   try {
     const data = req.body;
@@ -412,6 +417,7 @@ app.delete("/admin/ordenes/:id", async function (req, res) {
     res.status(400).send("Error en la BD");
   }
 });
+
 /////////////PRODUCTOS////////////////
 app.get("/admin/productos/:id", async function (req, res) {
   const idProducto = req.params.id;
@@ -422,57 +428,56 @@ app.get("/admin/productos/:id", async function (req, res) {
     res.status(400).json("Error en la BD");
   }
 });
+
 app.get("/admin/productos", async function (req, res) {
   const productos = await Producto.findAll({ order: [["id", "ASC"]] });
   res.status(201).json(productos);
 });
-app.get(
-  "/admin/usuario/:idUser/orden/:idOrden/productos",
-  async function (req, res) {
-    const idUser = req.params.idUser;
-    const idOrden = req.params.idOrden;
 
-    try {
-      const usuario = await Usuario.findOne({ where: { id: idUser } });
-      if (!usuario) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
+app.get("/admin/usuario/:idUser/orden/:idOrden/productos", async function (req, res) {
+  const idUser = req.params.idUser;
+  const idOrden = req.params.idOrden;
 
-      const orden = await Orden.findOne({
-        where: { id: idOrden, usuarioId: idUser },
-        include: [
-          {
-            model: Producto,
-            through: { attributes: [] }, // Esto asume que hay una tabla intermedia
-            attributes: [
-              "id",
-              "detalle",
-              "precio",
-              "fechaRegistro",
-              "stock",
-              "estado",
-            ],
-            order: [["id", "ASC"]],
-          },
-        ],
-        order: [["id", "ASC"]],
-      });
-
-      if (!orden) {
-        return res.status(404).json({ error: "Orden no encontrada" });
-      }
-
-      res.json(orden.Productos);
-    } catch (error) {
-      console.error("Error al obtener los productos:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+  try {
+    const usuario = await Usuario.findOne({ where: { id: idUser } });
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
+
+    const orden = await Orden.findOne({
+      where: { id: idOrden, usuarioId: idUser },
+      include: [
+        {
+          model: Producto,
+          through: { attributes: [] }, // Esto asume que hay una tabla intermedia
+          attributes: [
+            "id",
+            "detalle",
+            "precio",
+            "fechaRegistro",
+            "stock",
+            "estado",
+          ],
+          order: [["id", "ASC"]],
+        },
+      ],
+      order: [["id", "ASC"]],
+    });
+
+    if (!orden) {
+      return res.status(404).json({ error: "Orden no encontrada" });
+    }
+
+    res.json(orden.Productos);
+  } catch (error) {
+    console.error("Error al obtener los productos:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
-);
+});
+
 app.post("/admin/productos", async function (req, res) {
   try {
-    const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen } =
-      req.body;
+    const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen } = req.body;
     const nuevoProducto = await Producto.create({
       nombre,
       detalle,
@@ -488,6 +493,50 @@ app.post("/admin/productos", async function (req, res) {
     res.status(500).json({ error: "Error al crear el producto" });
   }
 });
+
+app.put("/admin/productos/:id", async function (req, res) {
+  const idProducto = req.params.id;
+  try {
+    const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen } = req.body;
+
+    // Validar que precio y stock sean números
+    const precioParsed = parseInt(precio, 10);
+    const stockParsed = parseInt(stock, 10);
+
+    if (isNaN(precioParsed) || isNaN(stockParsed)) {
+      return res.status(400).send("Precio y Stock deben ser números válidos");
+    }
+
+    const producto = await Producto.findOne({ where: { id: idProducto } });
+    if (producto) {
+      await producto.update({
+        nombre,
+        detalle,
+        precio: precioParsed,
+        fechaRegistro,
+        stock: stockParsed,
+        estado,
+        imagen,
+      });
+      res.status(200).json(producto);
+    } else {
+      res.status(404).send("Producto no encontrado");
+    }
+  } catch (error) {
+    res.status(400).send("Error en la BD");
+  }
+});
+
+app.delete("/admin/productos/:id", async function (req, res) {
+  const idProducto = req.params.id;
+  try {
+    await Producto.destroy({ where: { id: idProducto } });
+    res.send("Producto eliminado");
+  } catch (error) {
+    res.status(400).send("Error en la BD");
+  }
+});
+
 /////////////SERIES////////////////
 app.get("/admin/series", async function (req, res) {
   try {
@@ -540,7 +589,6 @@ app.get("/admin/series/:id", async function (req, res) {
     res.status(500).json({ error: "Error al obtener la serie" });
   }
 });
-//dev
 
 app.post("/admin/series", async function (req, res) {
   try {
@@ -605,71 +653,23 @@ app.delete("/admin/series/:id", async function (req, res) {
     res.status(500).json({ error: "Error al eliminar la serie" });
   }
 });
-
-app.delete(
-  "/admin/series/:id/productos/:productoId",
-  async function (req, res) {
-    const idSerie = req.params.id;
-    const productoId = req.params.productoId;
-    try {
-      const serie = await Serie.findByPk(idSerie);
-      if (!serie) {
-        return res.status(404).json({ error: "Serie no encontrada" });
-      }
-      const producto = await Producto.findByPk(productoId);
-      if (!producto) {
-        return res.status(404).json({ error: "Producto no encontrado" });
-      }
-      await serie.removeProducto(producto);
-      res.status(200).send("Producto removido de la serie");
-    } catch (error) {
-      console.error("Error al remover el producto de la serie:", error);
-      res
-        .status(500)
-        .json({ error: "Error al remover el producto de la serie" });
-    }
-  }
-);
-
-app.delete("/admin/productos/:id", async function (req, res) {
-  const idProducto = req.params.id;
+//dev
+app.delete("/admin/series/:id/productos/:productoId", async function (req, res) {
+  const idSerie = req.params.id;
+  const productoId = req.params.productoId;
   try {
-    await Producto.destroy({ where: { id: idProducto } });
-    res.send("Producto eliminado");
-  } catch (error) {
-    res.status(400).send("Error en la BD");
-  }
-});
-app.put("/admin/productos/:id", async function (req, res) {
-  const idProducto = req.params.id;
-  try {
-    const { nombre, detalle, precio, fechaRegistro, stock, estado, imagen } =
-      req.body;
-
-    // Validar que precio y stock sean números
-    const precioParsed = parseInt(precio, 10);
-    const stockParsed = parseInt(stock, 10);
-
-    if (isNaN(precioParsed) || isNaN(stockParsed)) {
-      return res.status(400).send("Precio y Stock deben ser números válidos");
+    const serie = await Serie.findByPk(idSerie);
+    if (!serie) {
+      return res.status(404).json({ error: "Serie no encontrada" });
     }
-
-    const producto = await Producto.findOne({ where: { id: idProducto } });
-    if (producto) {
-      await producto.update({
-        nombre,
-        detalle,
-        precio: precioParsed,
-        fechaRegistro,
-        stock: stockParsed,
-        estado,
-        imagen,
-      });
-      res.status(200).json(producto);
-    } else {
-      res.status(404).send("Producto no encontrado");
+    const producto = await Producto.findByPk(productoId);
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
     }
+    await serie.removeProducto(producto);
+    res.status(200).send("Producto removido de la serie");
   } catch (error) {
-    res.status(400).send("Error en la BD");
+    console.error("Error al remover el producto de la serie:", error);
+    res.status(500).json({ error: "Error al remover el producto de la serie" });
   }
 });
